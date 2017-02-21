@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ public class ItemThreeFragment extends Fragment {
     //INITIATE CORE UI ELEMENTS FOR ACCESS IN ALL FUNCTIONS WITHIN THIS CLASS, BUT NOT CHILD CLASSES (which are handled instead by the rootview argument)
     Spinner rainbow_theme_spinner, alsa_theme_spinner;
     SeekBar rainbow_speed_seekbar, alsa_sensitivity_seekbar, alsa_mic_seekbar, alsa_vol_seekbar;
+    CardView alsa_card;
 
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
@@ -73,6 +75,8 @@ public class ItemThreeFragment extends Fragment {
         this.alsa_sensitivity_seekbar = (SeekBar) v.findViewById(R.id.alsa_sensitivity_seekbar);
         this.alsa_mic_seekbar = (SeekBar) v.findViewById(R.id.alsa_mic_seekbar);
         this.alsa_vol_seekbar = (SeekBar) v.findViewById(R.id.alsa_vol_seekbar);
+        this.alsa_card = (CardView) v.findViewById(R.id.card_anim_alsa);
+
 
         //INITIATE RAINBOW START BUTTON
         Button rainbow_start_button = (Button) v.findViewById(R.id.rainbow_start_button);
@@ -243,6 +247,15 @@ public class ItemThreeFragment extends Fragment {
                 String response_rainbow_speed = object.getString("dynamic_rainbow_speed");
                 int speed_pc = Math.round(Float.parseFloat(response_rainbow_speed)*100) -1;
                 rainbow_speed_seekbar.setProgress(speed_pc );
+            }
+            if (object.has("dynamic_alsa_enabled")){
+                int response_alsa_enabled = object.getInt("dynamic_alsa_enabled");
+                if (response_alsa_enabled==0) {
+                    this.alsa_card.setVisibility(View.GONE);
+                }
+                else {
+                    this.alsa_card.setVisibility(View.VISIBLE);
+                }
             }
             if (object.has("dynamic_alsa_mode")){
                 int response_alsa_mode = object.getInt("dynamic_alsa_mode");

@@ -92,7 +92,11 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_centerHorizontal="true">
+                        android:layout_centerHorizontal="true"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:clipToPadding="false">
 
                         <Button
                             android:id="@+id/clamp_button_night"

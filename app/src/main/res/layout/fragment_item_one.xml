@@ -202,6 +202,7 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="12dp"
+                    android:clipToPadding="false"
                     android:focusable="true" android:focusableInTouchMode="true">
 
                     <TextView
@@ -239,7 +240,7 @@
                         android:text="@string/time_set"
                         android:layout_alignBottom="@+id/alarm_time_text"
                         android:layout_toRightOf="@+id/alarm_time_text"
-                        android:layout_alignParentRight="true"/>
+                        android:layout_alignParentRight="true" />
 
                     <TextView android:id="@+id/alarm_lead_label"
                         android:layout_below="@id/alarm_time_text"

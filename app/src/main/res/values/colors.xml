@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#455A64</color>
+    <color name="colorPrimaryDark">#263238</color>
+    <color name="colorAccent">#2196F3</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_trans">#99FFFFFF</color>
+
+    <color name="label_inactive">#b5433f</color>
+    <color name="label_active">#3fb54b</color>
+
+    <color name="clamp_night">#fd6303</color>
+    <color name="clamp_evening">#ff912d</color>
+    <color name="clamp_desk">#ffd8af</color>
+    <color name="clamp_daylight">#ffe4cd</color>
+    <color name="clamp_daylight_btn">#fff9f6</color>
+</resources>

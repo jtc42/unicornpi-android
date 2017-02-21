@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="192.168.0.3"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Device IP or hostname"
+        android:inputType="number"
+        android:key="prefs_device_ip"
+        android:summary="Local IP address or .local hostname of the device" />
+
+    <EditTextPreference
+        android:defaultValue="5000"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Device port"
+        android:inputType="number"
+        android:key="prefs_device_port"
+        android:summary="Port on which the Unicorn Pi server is running" />
+
+    <EditTextPreference
+        android:defaultValue="1.0"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="API version"
+        android:inputType="number"
+        android:key="prefs_api_version"
+        android:summary="Avoid modifying where possible" />
+</PreferenceScreen>

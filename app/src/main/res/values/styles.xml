@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Clamp_Night_Theme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/clamp_night</item>
+        <item name="colorPrimaryDark">@color/clamp_night</item>
+        <item name="colorAccent">@color/clamp_night</item>
+    </style>
+
+    <style name="Clamp_Evening_Theme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/clamp_evening</item>
+        <item name="colorPrimaryDark">@color/clamp_evening</item>
+        <item name="colorAccent">@color/clamp_evening</item>
+    </style>
+
+    <style name="Clamp_Desk_Theme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/clamp_desk</item>
+        <item name="colorPrimaryDark">@color/clamp_desk</item>
+        <item name="colorAccent">@color/clamp_desk</item>
+    </style>
+
+    <style name="Clamp_Day_Theme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/clamp_daylight_btn</item>
+        <item name="colorPrimaryDark">@color/clamp_daylight_btn</item>
+        <item name="colorAccent">@color/clamp_daylight_btn</item>
+    </style>
+
+</resources>

@@ -103,6 +103,19 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.frame_layout, ItemOneFragment.newInstance());
         transaction.commit();
 
+        //Handle intents, for launcher shortcuts
+        Intent iin= getIntent();
+        Bundle bnd = iin.getExtras();
+
+        if(bnd!=null) //If intent extras exist
+        {
+            String intent_arg =(String) bnd.get("android.intent.extra.TEXT"); //Create a string 'intent_arg' based on intent extra 'TEXT'
+            if(intent_arg != null) { //If intent extra text is not empty
+                //showSnack(intent_arg); //Process extra text
+                new RetrieveFeedTask(intent_arg).execute();
+            }
+        }
+
     }
 
 

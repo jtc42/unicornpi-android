@@ -25,7 +25,6 @@
     <string name="alarm_status_inactive">Alarm not set</string>
     <string name="alarm_status_active">Alarm set</string>
 
-    <string name="clamp_title">Colour</string>
     <string name="clamp_rgb_label">RGB</string>
     <string name="clamp_white_label">Thermal</string>
 
@@ -57,87 +56,20 @@
     <string name="time_tail">Tail time (minutes)</string>
 
 
-
-    <string name="long_text">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam neque ipsum, porta eu ultricies eu, bibendum in ex. Donec vel ante mi. Maecenas quis posuere leo. Nunc tempus sollicitudin libero, ac condimentum mauris feugiat quis. Etiam placerat est vel elit ornare, id facilisis sapien cursus. Etiam in arcu nisi. Proin laoreet ultrices dictum. Etiam aliquam, turpis in interdum cursus, nibh ex luctus orci, quis hendrerit nulla tellus nec nibh. Curabitur eleifend vehicula elit, in posuere justo dictum ac. Suspendisse quis vehicula ligula. Proin vehicula euismod nisl a aliquam. Aliquam at blandit felis.
-
-    Aenean dictum maximus erat sit amet fringilla. Vivamus placerat laoreet placerat. Phasellus quis iaculis lectus. Pellentesque ultricies sodales consequat. Vestibulum vehicula, mauris eget efficitur semper, ligula magna auctor neque, et ultricies libero enim et arcu. Donec maximus libero sit amet venenatis efficitur. Aenean cursus tristique turpis, non vulputate lacus finibus sit amet.
-
-    Aenean non maximus risus. Duis ac nibh eu nulla sollicitudin lobortis ut in arcu. Proin ornare, urna sed ornare pharetra, tortor risus feugiat urna, eu ullamcorper sapien sem eu nunc. Duis sed elit facilisis, laoreet dui eu, interdum est. Nulla sagittis commodo posuere. Ut sit amet neque elit. In mattis tellus eget lorem volutpat eleifend. Sed auctor metus quis eleifend dapibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
-
-    Nunc gravida aliquet mauris, id dignissim nunc laoreet a. Vivamus dictum non sapien quis semper. Curabitur lacinia aliquam magna a imperdiet. Proin eros enim, viverra in scelerisque sed, pulvinar sit amet ex. Nulla odio ipsum, elementum at posuere sit amet, maximus non massa. Phasellus mattis gravida viverra. Maecenas eros nisi, dictum vitae ex a, laoreet hendrerit justo. Curabitur sed est nec mi placerat posuere. Maecenas mauris risus, dapibus eget justo a, venenatis suscipit massa. Morbi at tincidunt neque, nec imperdiet neque. Etiam tristique est risus, a finibus neque hendrerit feugiat. Integer purus nisi, elementum sit amet est nec, vulputate tincidunt nibh. Duis dignissim commodo dignissim. Mauris pellentesque euismod magna, vitae malesuada justo.
-    </string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
 
     <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
 
-    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="short_clear">Clear</string>
+    <string name="short_night">Night</string>
+    <string name="short_evening">Evening</string>
+    <string name="short_bright">Bright</string>
+    <string name="short_dim">Dim</string>
 
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
 </resources>

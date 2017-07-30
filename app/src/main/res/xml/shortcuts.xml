@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="shortcut_clear"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_clear"
+        android:shortcutLongLabel="@string/short_clear"
+        android:shortcutShortLabel="@string/short_clear"
+        android:shortcutDisabledMessage="@string/short_clear" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
+            android:targetPackage="com.joeltcollins.unicornpi">
+            <extra android:name="android.intent.extra.TEXT" android:value="status/clear" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_night"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_night"
+        android:shortcutLongLabel="@string/short_night"
+        android:shortcutShortLabel="@string/short_night"
+        android:shortcutDisabledMessage="@string/short_night" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
+            android:targetPackage="com.joeltcollins.unicornpi">
+            <extra android:name="android.intent.extra.TEXT" android:value="clamp/set?hex=ff880d&amp;status=1" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_evening"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_evening"
+        android:shortcutLongLabel="@string/short_evening"
+        android:shortcutShortLabel="@string/short_evening"
+        android:shortcutDisabledMessage="@string/short_evening" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
+            android:targetPackage="com.joeltcollins.unicornpi">
+            <extra android:name="android.intent.extra.TEXT" android:value="clamp/set?hex=ff9f46&amp;status=1" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_bright"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_bright"
+        android:shortcutLongLabel="@string/short_bright"
+        android:shortcutShortLabel="@string/short_bright"
+        android:shortcutDisabledMessage="@string/short_bright" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
+            android:targetPackage="com.joeltcollins.unicornpi">
+            <extra android:name="android.intent.extra.TEXT" android:value="brightness/set?val=80" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_dim"
+        android:enabled="true"
+        android:icon="@drawable/ic_short_dim"
+        android:shortcutLongLabel="@string/short_dim"
+        android:shortcutShortLabel="@string/short_dim"
+        android:shortcutDisabledMessage="@string/short_dim" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
+            android:targetPackage="com.joeltcollins.unicornpi">
+            <extra android:name="android.intent.extra.TEXT" android:value="brightness/set?val=20" />
+        </intent>
+    </shortcut>
+
+</shortcuts>

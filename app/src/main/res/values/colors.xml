@@ -12,6 +12,5 @@
     <color name="clamp_night">#fd6303</color>
     <color name="clamp_evening">#ff912d</color>
     <color name="clamp_desk">#ffd8af</color>
-    <color name="clamp_daylight">#ffe4cd</color>
     <color name="clamp_daylight_btn">#fff9f6</color>
 </resources>

@@ -6,9 +6,9 @@ android {
     defaultConfig {
         applicationId "com.joeltcollins.unicornpi"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
-        versionName "1.2"
+        versionName "1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

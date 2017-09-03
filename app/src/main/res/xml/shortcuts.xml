@@ -16,6 +16,7 @@
         </intent>
     </shortcut>
 
+    <!--
     <shortcut
         android:shortcutId="shortcut_night"
         android:enabled="true"
@@ -30,6 +31,7 @@
             <extra android:name="android.intent.extra.TEXT" android:value="clamp/set?hex=ff880d&amp;status=1" />
         </intent>
     </shortcut>
+    -->
 
     <shortcut
         android:shortcutId="shortcut_evening"

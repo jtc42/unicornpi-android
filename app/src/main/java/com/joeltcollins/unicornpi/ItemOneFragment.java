@@ -242,7 +242,7 @@ public class ItemOneFragment extends Fragment {
 
         String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
         String device_port = pref.getString("prefs_device_port", "5000");
-        String api_version = pref.getString("prefs_api_version", "51.0");
+        String api_version = pref.getString("prefs_api_version", "1.0");
         String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string

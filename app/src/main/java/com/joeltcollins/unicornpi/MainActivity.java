@@ -43,20 +43,13 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    //Initialise shared preference for access in other child classes
-    private SharedPreferences pref;
-
 
     //ONCREATE FUNCTIONS
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //General set up stuff
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Set up shared preferences
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         //Set up bottom navigation bar and populate
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
@@ -96,25 +89,60 @@ public class MainActivity extends AppCompatActivity {
         {
             String intent_arg =(String) bnd.get("android.intent.extra.TEXT"); //Create a string 'intent_arg' based on intent extra 'TEXT'
             if(intent_arg != null) { //If intent extra text is not empty
-                //showSnack(intent_arg); //Process extra text
                 new RetrieveFeedTask(intent_arg).execute();
             }
         }
 
     }
 
-
     //BASIC FUNCTIONALITY
-
     //Show a snack, with message passed as an argument
     public void showSnack(String message) {
         Snackbar.make(findViewById(R.id.placeSnackBar), message, Snackbar.LENGTH_LONG)
                 .show();
     }
 
+    // Generate the API base URL from preferences
+    public String getAPIBase() {
+        //Handle preferences and API URL
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
+        String device_port = pref.getString("prefs_device_port", "5000");
+        String api_version = pref.getString("prefs_api_version", "1.0");
+        return "http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
+    }
+
+    // Return string of content returned from a URL
+    public String getFromURL(String url_string) {
+        try {
+            //Set up URL from arguments and root
+            URL url = new URL(url_string);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line).append("\n");
+                }
+                bufferedReader.close();
+                //If connection successful, return obtained JSON string
+                return stringBuilder.toString();
+            }
+            finally{
+                //Close connection
+                urlConnection.disconnect();
+            }
+        }
+        catch(Exception e) {
+            Log.e("ERROR", e.getMessage(), e);
+            //If connection failed, return null string
+            return null;
+        }
+    }
 
     //GUI SETUP FUNCTIONS
-
     //Expand the main menu into the menu bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,12 +158,10 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_main_clear:
                 new RetrieveFeedTask("status/clear").execute();
-                //showSnack("Lamp cleared");
                 return true;
             case R.id.menu_main_settings:
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
-                showSnack("Settings button pressed...");
                 return true;
             case R.id.menu_main_about:
                 String versionName = BuildConfig.VERSION_NAME;
@@ -146,15 +172,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     //BASIC EMPTY RETREIVEFEED CLASS (ONLY USED FOR CLEARING, SHUTDOWN ETC WHERE NO GUI NEEDED)
     class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
-
-        //Handle preferences and API URL
-        final String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        final String device_port = pref.getString("prefs_device_port", "5000");
-        final String api_version = pref.getString("prefs_api_version", "51.0");
-        final String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string
         private final String api_arg;
@@ -162,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
         //Set up the function to allow arguments to be passed
         RetrieveFeedTask(String api_argument){
             super();
-
             //Get API argument from asynctask call argument
             api_arg = api_argument;
 
@@ -175,31 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Main asynctask
         protected String doInBackground(Void... params) {
-            try {
-                //Set up URL from arguments and root
-                URL url = new URL(api_root+api_arg);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line).append("\n");
-                    }
-                    bufferedReader.close();
-                    //If connection successful, return obtained JSON string
-                    return stringBuilder.toString();
-                }
-                finally{
-                    //Close connection
-                    urlConnection.disconnect();
-                }
-            }
-            catch(Exception e) {
-                Log.e("ERROR", e.getMessage(), e);
-                //If connection failed, return null string
-                return null;
-            }
+            return getFromURL(getAPIBase() + api_arg);
         }
 
         //After executing asynctask
@@ -216,6 +210,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
 
 }

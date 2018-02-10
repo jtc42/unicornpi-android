@@ -16,23 +16,6 @@
         </intent>
     </shortcut>
 
-    <!--
-    <shortcut
-        android:shortcutId="shortcut_night"
-        android:enabled="true"
-        android:icon="@drawable/ic_short_night"
-        android:shortcutLongLabel="@string/short_night"
-        android:shortcutShortLabel="@string/short_night"
-        android:shortcutDisabledMessage="@string/short_night" >
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="com.joeltcollins.unicornpi.MainActivity"
-            android:targetPackage="com.joeltcollins.unicornpi">
-            <extra android:name="android.intent.extra.TEXT" android:value="clamp/set?hex=ff880d&amp;status=1" />
-        </intent>
-    </shortcut>
-    -->
-
     <shortcut
         android:shortcutId="shortcut_evening"
         android:enabled="true"

@@ -20,33 +20,20 @@
 
 package com.joeltcollins.unicornpi;
 
-import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.util.Log;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import android.os.AsyncTask;
-
 
 
 public class ItemTwoFragment extends Fragment {
@@ -131,15 +118,11 @@ public class ItemTwoFragment extends Fragment {
             }
         });
 
-
-
         //GET API RESPONSE FOR UI STARTUP
         new ItemTwoFragment.RetrieveFeedTask(v, "status/all",true).execute();
 
         return v;
     }
-
-
 
     //RETREIVEFEED CLASS
     class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
@@ -147,14 +130,6 @@ public class ItemTwoFragment extends Fragment {
         //Set up core UI references
         private final RelativeLayout progressBar;
         private final RelativeLayout mainLayout;
-
-        //Handle preferences and API URL
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        final String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        final String device_port = pref.getString("prefs_device_port", "5000");
-        final String api_version = pref.getString("prefs_api_version", "1.0");
-        final String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string
         private final String api_arg;
@@ -168,9 +143,6 @@ public class ItemTwoFragment extends Fragment {
         //Set up the function to allow arguments to be passed
         RetrieveFeedTask(View rootView, String api_argument, boolean progress_bar){
             super();
-
-            //Grab rootview from argument, to set up core UI elements
-
             //Set up core UI elements
             this.progressBar = rootView.findViewById(R.id.clamp_progressLayout);
             this.mainLayout = rootView.findViewById(R.id.clamp_mainLayout);
@@ -193,31 +165,7 @@ public class ItemTwoFragment extends Fragment {
 
         //Main asynctask
         protected String doInBackground(Void... params) {
-            try {
-                //Set up URL from arguments and root
-                URL url = new URL(api_root+api_arg);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line).append("\n");
-                    }
-                    bufferedReader.close();
-                    //If connection successful, return obtained JSON string
-                    return stringBuilder.toString();
-                }
-                finally{
-                    //Close connection
-                    urlConnection.disconnect();
-                }
-            }
-            catch(Exception e) {
-                Log.e("ERROR", e.getMessage(), e);
-                //If connection failed, return null string
-                return null;
-            }
+            return activity.getFromURL(activity.getAPIBase() + api_arg);
         }
 
         //After executing asynctask
@@ -241,7 +189,6 @@ public class ItemTwoFragment extends Fragment {
 
         }
     }
-
 
     //HANDLE JSON RESPONSE
     private void HandleResponse(String response){

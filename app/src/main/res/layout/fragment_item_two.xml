@@ -99,7 +99,6 @@
                             android:layout_weight="1"
                             style="@style/Widget.AppCompat.Button.Colored"
                             android:theme="@style/Clamp_Night_Theme"
-                            android:layout_column="0"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <Button
@@ -107,7 +106,6 @@
                             android:layout_weight="1"
                             style="@style/Widget.AppCompat.Button.Colored"
                             android:theme="@style/Clamp_Evening_Theme"
-                            android:layout_column="1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <Button
@@ -115,7 +113,6 @@
                             android:layout_weight="1"
                             style="@style/Widget.AppCompat.Button.Colored"
                             android:theme="@style/Clamp_Desk_Theme"
-                            android:layout_column="2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                         <Button
@@ -123,7 +120,6 @@
                             android:layout_weight="1"
                             style="@style/Widget.AppCompat.Button.Colored"
                             android:theme="@style/Clamp_Day_Theme"
-                            android:layout_column="3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 

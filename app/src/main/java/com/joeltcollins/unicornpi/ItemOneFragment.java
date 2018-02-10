@@ -58,15 +58,21 @@ public class ItemOneFragment extends Fragment {
     }
 
     //INITIATE CORE UI ELEMENTS FOR ACCESS IN ALL FUNCTIONS WITHIN THIS CLASS, BUT NOT CHILD CLASSES (which are handled instead by the rootview argument)
-    SeekBar brightness_seekbar, fade_target_seekbar;
-    TextView alarm_time_text, alarm_status, fade_status;
-    EditText alarm_lead, alarm_tail, fade_time;
+    private SeekBar brightness_seekbar;
+    private SeekBar fade_target_seekbar;
+    private TextView alarm_time_text;
+    private TextView alarm_status;
+    private TextView fade_status;
+    private EditText alarm_lead;
+    private EditText alarm_tail;
+    private EditText fade_time;
     //Grab resources
-    String alarm_status_active, alarm_status_inactive, fade_status_active, fade_status_inactive;
-    int status_active, status_inactive;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
+    private String alarm_status_active;
+    private String alarm_status_inactive;
+    private String fade_status_active;
+    private String fade_status_inactive;
+    private int status_active;
+    private int status_inactive;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,14 +82,14 @@ public class ItemOneFragment extends Fragment {
         final View v = inflater.inflate(R.layout.fragment_item_one, container, false);
 
         //Get core UI elements to be updated by asynctask
-        this.brightness_seekbar = (SeekBar) v.findViewById(R.id.brightness_seekbar);
-        this.alarm_time_text = (TextView) v.findViewById(R.id.alarm_time_text);
-        this.alarm_lead = (EditText) v.findViewById(R.id.alarm_lead);
-        this.alarm_tail = (EditText) v.findViewById(R.id.alarm_tail);
-        this.alarm_status = (TextView) v.findViewById(R.id.alarm_status);
-        this.fade_time = (EditText) v.findViewById(R.id.fade_time);
-        this.fade_target_seekbar = (SeekBar) v.findViewById(R.id.fade_target_seekbar);
-        this.fade_status = (TextView) v.findViewById(R.id.fade_status);
+        this.brightness_seekbar = v.findViewById(R.id.brightness_seekbar);
+        this.alarm_time_text = v.findViewById(R.id.alarm_time_text);
+        this.alarm_lead = v.findViewById(R.id.alarm_lead);
+        this.alarm_tail = v.findViewById(R.id.alarm_tail);
+        this.alarm_status = v.findViewById(R.id.alarm_status);
+        this.fade_time = v.findViewById(R.id.fade_time);
+        this.fade_target_seekbar = v.findViewById(R.id.fade_target_seekbar);
+        this.fade_status = v.findViewById(R.id.fade_status);
         //Get resources
         this.alarm_status_active = getString(R.string.alarm_status_active);
         this.alarm_status_inactive = getString(R.string.alarm_status_inactive);
@@ -94,11 +100,11 @@ public class ItemOneFragment extends Fragment {
 
 
         //Initiate any remaining brightness controls
-        final TextView brightness_text = (TextView) v.findViewById(R.id.brightness_text);
+        final TextView brightness_text = v.findViewById(R.id.brightness_text);
         //BRIGHTNESS SEEK LISTENER & FUNCTIONS
         brightness_seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progress = 0;
-            MainActivity activity = (MainActivity) getActivity();
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
                 progress = progresValue;
@@ -126,12 +132,12 @@ public class ItemOneFragment extends Fragment {
 
 
         //INITIATE FADE START BUTTON
-        Button fade_start_button = (Button) v.findViewById(R.id.fade_start_button);
+        Button fade_start_button = v.findViewById(R.id.fade_start_button);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         fade_start_button.setOnClickListener(new View.OnClickListener() {
 
             //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
+            final MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -145,12 +151,12 @@ public class ItemOneFragment extends Fragment {
         });
 
         //INITIATE FADE STOP BUTTON
-        Button fade_stop_button = (Button) v.findViewById(R.id.fade_stop_button);
+        Button fade_stop_button = v.findViewById(R.id.fade_stop_button);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         fade_stop_button.setOnClickListener(new View.OnClickListener() {
 
             //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
+            final MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -162,12 +168,12 @@ public class ItemOneFragment extends Fragment {
 
 
         //INITIATE ALARM TIME BUTTON
-        Button alarm_time_button = (Button) v.findViewById(R.id.alarm_time_button);
+        Button alarm_time_button = v.findViewById(R.id.alarm_time_button);
         //ALARM TIME BUTTON LISTENER & FUNCTIONS
         alarm_time_button.setOnClickListener(new View.OnClickListener() {
 
             //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
+            final MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -182,12 +188,12 @@ public class ItemOneFragment extends Fragment {
 
 
         //INITIATE ALARM START BUTTON
-        Button alarm_start_button = (Button) v.findViewById(R.id.alarm_start_button);
+        Button alarm_start_button = v.findViewById(R.id.alarm_start_button);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         alarm_start_button.setOnClickListener(new View.OnClickListener() {
 
             //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
+            final MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -202,12 +208,12 @@ public class ItemOneFragment extends Fragment {
         });
 
         //INITIATE FADE STOP BUTTON
-        Button alarm_stop_button = (Button) v.findViewById(R.id.alarm_stop_button);
+        Button alarm_stop_button = v.findViewById(R.id.alarm_stop_button);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         alarm_stop_button.setOnClickListener(new View.OnClickListener() {
 
             //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
+            final MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -228,42 +234,36 @@ public class ItemOneFragment extends Fragment {
     //RETREIVEFEED CLASS
     class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
 
-        private Exception exception;
-
-        //Set up rootview argument
-        private View rootView;
-
         //Set up core UI references
-        private RelativeLayout progressBar;
-        private ScrollView mainLayout;
+        private final RelativeLayout progressBar;
+        private final ScrollView mainLayout;
 
         //Handle preferences and API URL
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        String device_port = pref.getString("prefs_device_port", "5000");
-        String api_version = pref.getString("prefs_api_version", "1.0");
-        String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
+        final String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
+        final String device_port = pref.getString("prefs_device_port", "5000");
+        final String api_version = pref.getString("prefs_api_version", "1.0");
+        final String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string
-        private String api_arg;
+        private final String api_arg;
 
         //Get mainactivity for sending snackbars etc
-        MainActivity activity = (MainActivity) getActivity();
+        final MainActivity activity = (MainActivity) getActivity();
 
         //Set up variable for argument determining if progressbar should show
-        private boolean show_progress;
+        private final boolean show_progress;
 
         //Set up the function to allow arguments to be passed
-        public RetrieveFeedTask(View rootView, String api_argument, boolean progress_bar){
+        RetrieveFeedTask(View rootView, String api_argument, boolean progress_bar){
             super();
 
             //Grab rootview from argument, to set up core UI elements
-            this.rootView=rootView;
 
             //Set up core UI elements
-            this.progressBar = (RelativeLayout) rootView.findViewById(R.id.system_progressLayout);
-            this.mainLayout = (ScrollView) rootView.findViewById(R.id.system_mainLayout);
+            this.progressBar = rootView.findViewById(R.id.system_progressLayout);
+            this.mainLayout = rootView.findViewById(R.id.system_mainLayout);
 
             //Get API argument from asynctask call argument
             api_arg = api_argument;
@@ -275,7 +275,7 @@ public class ItemOneFragment extends Fragment {
         //Before executing asynctask
         protected void onPreExecute() {
             //Show progressbars, hide content
-            if (show_progress == true) {
+            if (show_progress) {
                 this.progressBar.setVisibility(View.VISIBLE);
                 this.mainLayout.setVisibility(View.GONE);
             }
@@ -324,7 +324,7 @@ public class ItemOneFragment extends Fragment {
             }
 
             //Hide progressbar, show content
-            if (show_progress==true) {
+            if (show_progress) {
                 this.progressBar.setVisibility(View.GONE);
                 this.mainLayout.setVisibility(View.VISIBLE);
             }
@@ -344,7 +344,7 @@ public class ItemOneFragment extends Fragment {
             }
             if (object.has("global_brightness_val")){
                 int response_brightness_val = object.getInt("global_brightness_val");
-                if (update_brightness_slider == true) {
+                if (update_brightness_slider) {
                     brightness_seekbar.setProgress(response_brightness_val);
                 }
             }

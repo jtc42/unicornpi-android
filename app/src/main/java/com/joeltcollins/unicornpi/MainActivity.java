@@ -20,7 +20,6 @@
 
 package com.joeltcollins.unicornpi;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -32,33 +31,20 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.prefs.Preferences;
-
-import com.joeltcollins.unicornpi.BuildConfig;
 
 public class MainActivity extends AppCompatActivity {
 
-    //KEY VARIABLES
-    String device_ip="0.0.0.0";
-    String device_port="5000";
-    String api_version="1.0";
-    String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
-
-    String versionName = BuildConfig.VERSION_NAME;
-
     //Initialise shared preference for access in other child classes
-    SharedPreferences pref;
+    private SharedPreferences pref;
 
 
     //ONCREATE FUNCTIONS
@@ -73,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         //Set up bottom navigation bar and populate
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)
-                findViewById(R.id.navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -127,11 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    //Function for when card button is pressed. Just a demo. Pointless
-    public void updateCard(View view) {
-        showSnack("Card button pressed...");
-    }
-
 
     //GUI SETUP FUNCTIONS
 
@@ -158,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
                 showSnack("Settings button pressed...");
                 return true;
             case R.id.menu_main_about:
-                showSnack("Unicorn Pi for Android, version "+versionName);
+                String versionName = BuildConfig.VERSION_NAME;
+                showSnack("Unicorn Pi for Android, version "+ versionName);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -169,21 +150,17 @@ public class MainActivity extends AppCompatActivity {
     //BASIC EMPTY RETREIVEFEED CLASS (ONLY USED FOR CLEARING, SHUTDOWN ETC WHERE NO GUI NEEDED)
     class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
 
-        private Exception exception;
-
         //Handle preferences and API URL
-        String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        String device_port = pref.getString("prefs_device_port", "5000");
-        String api_version = pref.getString("prefs_api_version", "51.0");
-        String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
+        final String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
+        final String device_port = pref.getString("prefs_device_port", "5000");
+        final String api_version = pref.getString("prefs_api_version", "51.0");
+        final String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string
-        private String api_arg;
-
-        private boolean show_progress;
+        private final String api_arg;
 
         //Set up the function to allow arguments to be passed
-        public RetrieveFeedTask(String api_argument){
+        RetrieveFeedTask(String api_argument){
             super();
 
             //Get API argument from asynctask call argument
@@ -235,10 +212,6 @@ public class MainActivity extends AppCompatActivity {
                 //Call function to handle response string, only if response not null
                 //Log response to debug terminal
                 Log.i("INFO", response);
-            }
-
-            if (show_progress==true) {
-                //Hide progressbar, show content
             }
 
         }

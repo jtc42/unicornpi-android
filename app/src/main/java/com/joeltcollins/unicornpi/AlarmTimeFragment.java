@@ -6,7 +6,6 @@ import android.text.format.DateFormat;
 import android.widget.TextView;
 import android.app.DialogFragment;
 import android.app.Dialog;
-import java.util.Calendar;
 import android.widget.TimePicker;
 
 
@@ -17,12 +16,7 @@ public class AlarmTimeFragment extends DialogFragment implements TimePickerDialo
     public Dialog onCreateDialog(Bundle savedInstanceState){
 
         //Set up the textview object to grab the currently set time
-        TextView alarm_time_text = (TextView) getActivity().findViewById(R.id.alarm_time_text);
-
-        //Use the current time as the default values for the time picker
-        final Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        TextView alarm_time_text = getActivity().findViewById(R.id.alarm_time_text);
 
         //Get current time value from the textview
         String current_time = alarm_time_text.getText().toString();
@@ -38,7 +32,7 @@ public class AlarmTimeFragment extends DialogFragment implements TimePickerDialo
     public void onTimeSet(TimePicker view, int hourOfDay, int minute){
         //Do something with the user chosen time
         //Get reference of host activity (XML Layout File) TextView widget
-        TextView alarm_time_text = (TextView) getActivity().findViewById(R.id.alarm_time_text);
+        TextView alarm_time_text = getActivity().findViewById(R.id.alarm_time_text);
 
         String formatted_time = String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute);
 

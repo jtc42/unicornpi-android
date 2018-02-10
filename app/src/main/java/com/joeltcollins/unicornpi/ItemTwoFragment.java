@@ -20,6 +20,7 @@
 
 package com.joeltcollins.unicornpi;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -50,17 +51,11 @@ import android.os.AsyncTask;
 
 public class ItemTwoFragment extends Fragment {
     public static ItemTwoFragment newInstance() {
-        ItemTwoFragment fragment = new ItemTwoFragment();
-        return fragment;
+        return new ItemTwoFragment();
     }
 
     //INITIATE CORE UI ELEMENTS FOR ACCESS IN ALL FUNCTIONS WITHIN THIS CLASS, BUT NOT CHILD CLASSES (which are handled instead by the rootview argument)
-    ColorPickerView colorPickerView;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private ColorPickerView colorPickerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,14 +66,11 @@ public class ItemTwoFragment extends Fragment {
 
 
         //INITIATE COLOR PICKER (find in current view)
-        this.colorPickerView = (ColorPickerView) v.findViewById(R.id.color_picker_view);
+        this.colorPickerView = v.findViewById(R.id.color_picker_view);
         //COLOR PICKER LISTENER
         colorPickerView.addOnColorSelectedListener(new OnColorSelectedListener() {
             @Override
             public void onColorSelected(int selectedColor) {
-
-                //Find main activity (used to call main activity functions)
-                MainActivity activity = (MainActivity) getActivity();
 
                 //RGB hex string of selected color
                 String hex_string = Integer.toHexString(selectedColor).toUpperCase().substring(2, 8);
@@ -88,12 +80,9 @@ public class ItemTwoFragment extends Fragment {
 
 
         //INITIATE NIGHT START BUTTON
-        Button clamp_button_night = (Button) v.findViewById(R.id.clamp_button_night);
+        Button clamp_button_night = v.findViewById(R.id.clamp_button_night);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_night.setOnClickListener(new View.OnClickListener() {
-
-            //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -104,12 +93,9 @@ public class ItemTwoFragment extends Fragment {
         });
 
         //INITIATE EVENING START BUTTON
-        Button clamp_button_evening = (Button) v.findViewById(R.id.clamp_button_evening);
+        Button clamp_button_evening = v.findViewById(R.id.clamp_button_evening);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_evening.setOnClickListener(new View.OnClickListener() {
-
-            //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -120,12 +106,9 @@ public class ItemTwoFragment extends Fragment {
         });
 
         //INITIATE DESK START BUTTON
-        Button clamp_button_desk = (Button) v.findViewById(R.id.clamp_button_desk);
+        Button clamp_button_desk = v.findViewById(R.id.clamp_button_desk);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_desk.setOnClickListener(new View.OnClickListener() {
-
-            //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -136,12 +119,9 @@ public class ItemTwoFragment extends Fragment {
         });
 
         //INITIATE DAY START BUTTON
-        Button clamp_button_day = (Button) v.findViewById(R.id.clamp_button_day);
+        Button clamp_button_day = v.findViewById(R.id.clamp_button_day);
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_day.setOnClickListener(new View.OnClickListener() {
-
-            //Get main activity
-            MainActivity activity = (MainActivity) getActivity();
 
             @Override
             public void onClick(View view)
@@ -164,42 +144,36 @@ public class ItemTwoFragment extends Fragment {
     //RETREIVEFEED CLASS
     class RetrieveFeedTask extends AsyncTask<Void, Void, String> {
 
-        private Exception exception;
-
-        //Set up rootview argument
-        private View rootView;
-
         //Set up core UI references
-        private RelativeLayout progressBar;
-        private RelativeLayout mainLayout;
+        private final RelativeLayout progressBar;
+        private final RelativeLayout mainLayout;
 
         //Handle preferences and API URL
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        String device_port = pref.getString("prefs_device_port", "5000");
-        String api_version = pref.getString("prefs_api_version", "1.0");
-        String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
+        final String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
+        final String device_port = pref.getString("prefs_device_port", "5000");
+        final String api_version = pref.getString("prefs_api_version", "1.0");
+        final String api_root="http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
 
         //Initiate API argument string
-        private String api_arg;
+        private final String api_arg;
 
         //Get mainactivity for sending snackbars etc
-        MainActivity activity = (MainActivity) getActivity();
+        final MainActivity activity = (MainActivity) getActivity();
 
         //Set up variable for argument determining if progressbar should show
-        private boolean show_progress;
+        private final boolean show_progress;
 
         //Set up the function to allow arguments to be passed
-        public RetrieveFeedTask(View rootView, String api_argument, boolean progress_bar){
+        RetrieveFeedTask(View rootView, String api_argument, boolean progress_bar){
             super();
 
             //Grab rootview from argument, to set up core UI elements
-            this.rootView=rootView;
 
             //Set up core UI elements
-            this.progressBar = (RelativeLayout) rootView.findViewById(R.id.clamp_progressLayout);
-            this.mainLayout = (RelativeLayout) rootView.findViewById(R.id.clamp_mainLayout);
+            this.progressBar = rootView.findViewById(R.id.clamp_progressLayout);
+            this.mainLayout = rootView.findViewById(R.id.clamp_mainLayout);
 
             //Get API argument from asynctask call argument
             api_arg = api_argument;
@@ -211,7 +185,7 @@ public class ItemTwoFragment extends Fragment {
         //Before executing asynctask
         protected void onPreExecute() {
             //Show progressbars, hide content
-            if (show_progress == true) {
+            if (show_progress) {
                 this.progressBar.setVisibility(View.VISIBLE);
                 this.mainLayout.setVisibility(View.GONE);
             }
@@ -260,7 +234,7 @@ public class ItemTwoFragment extends Fragment {
             }
 
             //Hide progressbar, show content
-            if (show_progress==true) {
+            if (show_progress) {
                 this.progressBar.setVisibility(View.GONE);
                 this.mainLayout.setVisibility(View.VISIBLE);
             }

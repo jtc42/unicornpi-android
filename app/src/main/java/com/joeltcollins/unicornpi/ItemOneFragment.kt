@@ -42,19 +42,20 @@ import kotlinx.android.synthetic.main.fragment_item_one.*
 
 class ItemOneFragment : Fragment() {
 
-    //Grab resources
-    private var alarm_status_active: String = getString(R.string.alarm_status_active)
-    private var alarm_status_inactive: String =getString(R.string.alarm_status_inactive)
-    private var fade_status_active: String = getString(R.string.fade_status_active)
-    private var fade_status_inactive: String = getString(R.string.fade_status_inactive)
-    private var status_active: Int = ContextCompat.getColor(context!!, R.color.label_active)
-    private var status_inactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         //Get current view
         val v = inflater.inflate(R.layout.fragment_item_one, container, false)
+
+        //Grab resources
+        var alarm_status_active: String = getString(R.string.alarm_status_active)
+        var alarm_status_inactive: String = getString(R.string.alarm_status_inactive)
+        var fade_status_active: String = getString(R.string.fade_status_active)
+        var fade_status_inactive: String = getString(R.string.fade_status_inactive)
+        var status_active: Int = ContextCompat.getColor(context!!, R.color.label_active)
+        var status_inactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
 
         //BRIGHTNESS SEEK LISTENER & FUNCTIONS
         brightness_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -274,8 +275,13 @@ class ItemOneFragment : Fragment() {
 
     companion object {
         fun newInstance(): ItemOneFragment {
-            return ItemOneFragment()
+            var fragmentHome = ItemOneFragment()
+            var args = Bundle()
+            fragmentHome.arguments = args
+            return fragmentHome
         }
+
     }
+
 
 }

@@ -32,10 +32,14 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 
 import java.net.URL
 
 class MainActivity : AppCompatActivity() {
+
+    // Set up frame_layout object
+    private var frame_layout: FrameLayout? = null
 
     // Generate the API base URL from preferences
     // Handle preferences and API URL
@@ -50,12 +54,16 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-    //ONCREATE FUNCTIONS
+    // ONCREATE FUNCTIONS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // POopulate frame_layout object
+        frame_layout = findViewById(R.id.frame_layout) as FrameLayout
+
         //Set up bottom navigation bar and populate
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             var selectedFragment: Fragment? = null
@@ -64,16 +72,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.action_item2 -> selectedFragment = ItemTwoFragment.newInstance()
                 R.id.action_item3 -> selectedFragment = ItemThreeFragment.newInstance()
             }
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frame_layout, selectedFragment)
-            transaction.commit()
+            addFragment(selectedFragment!!)
             true
         }
 
+
         //Manually displaying the first fragment - one time only
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.frame_layout, ItemOneFragment.newInstance())
-        transaction.commit()
+        val selectedFragment = ItemOneFragment.newInstance()
+        addFragment(selectedFragment)
 
         //Handle intents, for launcher shortcuts
         val iin = intent
@@ -90,6 +96,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     //BASIC FUNCTIONALITY
+
+    //add/replace fragment in container [framelayout]
+    private fun addFragment(fragment: Fragment) {
+        supportFragmentManager
+                .beginTransaction()
+                .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                .replace(R.id.frame_layout, fragment, fragment.javaClass.simpleName)
+                .addToBackStack(fragment.javaClass.simpleName)
+                .commit()
+    }
+
     //Show a snack, with message passed as an argument
     fun showSnack(message: String) =
             Snackbar.make(findViewById<View>(R.id.placeSnackBar), message, Snackbar.LENGTH_LONG)

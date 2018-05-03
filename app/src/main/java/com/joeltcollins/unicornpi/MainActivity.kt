@@ -36,6 +36,8 @@ import android.widget.FrameLayout
 
 import java.net.URL
 
+// TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
+
 class MainActivity : AppCompatActivity() {
 
     // Set up frameLayout object

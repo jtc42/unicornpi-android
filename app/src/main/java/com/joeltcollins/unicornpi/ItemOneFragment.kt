@@ -27,11 +27,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.RelativeLayout
-import android.widget.ScrollView
 import android.widget.SeekBar
-import android.widget.TextView
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -43,19 +39,22 @@ import kotlinx.android.synthetic.main.fragment_item_one.*
 class ItemOneFragment : Fragment() {
 
 
+    // While creating view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        //Get current view
-        val v = inflater.inflate(R.layout.fragment_item_one, container, false)
+        // Get current view
+        return inflater.inflate(R.layout.fragment_item_one, container, false)
+    }
 
-        //Grab resources
-        var alarm_status_active: String = getString(R.string.alarm_status_active)
-        var alarm_status_inactive: String = getString(R.string.alarm_status_inactive)
-        var fade_status_active: String = getString(R.string.fade_status_active)
-        var fade_status_inactive: String = getString(R.string.fade_status_inactive)
-        var status_active: Int = ContextCompat.getColor(context!!, R.color.label_active)
-        var status_inactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
+
+    // Once view has been inflated/created
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        //Grab resources from XML
+        val fadeStatusActive: String = getString(R.string.fade_status_active)
+        val fadeStatusInactive: String = getString(R.string.fade_status_inactive)
+        val statusInactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
 
         //BRIGHTNESS SEEK LISTENER & FUNCTIONS
         brightness_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -65,11 +64,11 @@ class ItemOneFragment : Fragment() {
                 progress = progresValue
                 brightness_text.text = Integer.toString(progress)
                 if (fromUser) { //Blocks API call if UI is just updating (caused fades to stop on app load)
-                    RetrieveFeedTask(v, "brightness/set?val=${progress.toString()}", false).execute()
+                    RetrieveFeedTask("brightness/set?val=$progress", false).execute()
                 }
-                if (fade_status.text.toString() == fade_status_active) {
-                    fade_status.text = fade_status_inactive
-                    fade_status.setTextColor(status_inactive)
+                if (fade_status.text.toString() == fadeStatusActive) {
+                    fade_status.text = fadeStatusInactive
+                    fade_status.setTextColor(statusInactive)
                 }
             }
 
@@ -78,7 +77,7 @@ class ItemOneFragment : Fragment() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                RetrieveFeedTask(v, "brightness/set?val=${progress.toString()}", false).execute()
+                RetrieveFeedTask("brightness/set?val=$progress", false).execute()
                 //activity.showSnack("Brightness set");
             }
         })
@@ -94,7 +93,7 @@ class ItemOneFragment : Fragment() {
                 val minutes = Integer.parseInt(fade_time!!.text.toString())
                 val target = fade_target_seekbar!!.progress / 100.toFloat()
 
-                RetrieveFeedTask(v, "fade/set?minutes=${minutes.toString()}&target=${target.toString()}&status=1", false).execute()
+                RetrieveFeedTask("fade/set?minutes=$minutes&target=$target&status=1", false).execute()
             }
         })
 
@@ -106,7 +105,7 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Fade stopped")
-                RetrieveFeedTask(v, "fade/set?&status=0", false).execute()
+                RetrieveFeedTask("fade/set?&status=0", false).execute()
             }
         })
 
@@ -137,7 +136,7 @@ class ItemOneFragment : Fragment() {
                 val tail = Integer.parseInt(alarm_tail.text.toString())
                 val time = alarm_time_text.text.toString()
 
-                RetrieveFeedTask(v, "alarm/set?lead=${lead.toString()}&tail=${tail.toString()}&time=$time&status=1", false).execute()
+                RetrieveFeedTask("alarm/set?lead=$lead&tail=$tail&time=$time&status=1", false).execute()
             }
         })
 
@@ -149,31 +148,31 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm unset")
-                RetrieveFeedTask(v, "alarm/set?&status=0", false).execute()
+                RetrieveFeedTask("alarm/set?&status=0", false).execute()
             }
         })
 
-        //GET API RESPONSE FOR UI STARTUP
-        RetrieveFeedTask(v, "status/all", true).execute()
+        // GET API RESPONSE FOR UI STARTUP
+        // Happens here because post-execute uses UI elements
+        RetrieveFeedTask("status/all", true).execute()
 
-        return v
     }
 
+
     //RETREIVEFEED CLASS
-    // TODO: Better, more Kotlin-y async task in all fragments
-    internal inner class RetrieveFeedTask(rootView: View,
-                                          private val api_arg: String,
+    // TODO: Better, more Kotlin-y async task in all fragments, fixing AsyncTask leak warning
+    internal inner class RetrieveFeedTask(private val api_arg: String,
                                           private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
 
         //Get mainactivity for sending snackbars etc
-        val activity: MainActivity = getActivity() as MainActivity
+        private val activity: MainActivity = getActivity() as MainActivity
 
         //Before executing asynctask
         override fun onPreExecute() {
             //Show progressbars, hide content
             if (show_progress) {
-                system_progressLayout.visibility = View.VISIBLE
-                system_mainLayout.visibility = View.GONE
+                system_progress_layout.visibility = View.VISIBLE
+                system_main_layout.visibility = View.GONE
             }
         }
 
@@ -195,8 +194,8 @@ class ItemOneFragment : Fragment() {
 
             //Hide progressbar, show content
             if (show_progress) {
-                system_progressLayout.visibility = View.GONE
-                system_mainLayout.visibility = View.VISIBLE
+                system_progress_layout.visibility = View.GONE
+                system_main_layout.visibility = View.VISIBLE
             }
 
         }
@@ -204,66 +203,77 @@ class ItemOneFragment : Fragment() {
 
     //HANDLE JSON RESPONSE
     private fun handleResponse(response: String) {
-        var update_brightness_slider = false
+        var updateBrightnessSlider = false
+
+        //Grab resources from XML
+        val alarmStatusActive: String = getString(R.string.alarm_status_active)
+        val alarmStatusInactive: String = getString(R.string.alarm_status_inactive)
+        val fadeStatusActive: String = getString(R.string.fade_status_active)
+        val fadeStatusInactive: String = getString(R.string.fade_status_inactive)
+        val statusActive: Int = ContextCompat.getColor(context!!, R.color.label_active)
+        val statusInactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
+
         try {
-            // TODO: Rename this weird `object` object in all fragments
-            val `object` = JSONTokener(response).nextValue() as JSONObject
+            val responseObject = JSONTokener(response).nextValue() as JSONObject
+
             //If global status is returned, route music have been status/all, so brightness slider should be updated
-            if (`object`.has("global_status")) {
-                update_brightness_slider = true
+            if (responseObject.has("global_status")) {
+                updateBrightnessSlider = true
             }
-            if (`object`.has("global_brightness_val")) {
-                val response_brightness_val = `object`.getInt("global_brightness_val")
-                if (update_brightness_slider) {
-                    brightness_seekbar!!.progress = response_brightness_val
+
+            if (responseObject.has("global_brightness_val")) {
+                val responseBrightnessVal = responseObject.getInt("global_brightness_val")
+                if (updateBrightnessSlider) {
+                    brightness_seekbar!!.progress = responseBrightnessVal
                 }
             }
-            if (`object`.has("special_alarm_time")) {
-                val alarm_time = `object`.getString("special_alarm_time")
 
-                val parts = alarm_time.split(":".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                val current_hours = Integer.parseInt(parts[0])
-                val current_mins = Integer.parseInt(parts[1])
+            if (responseObject.has("special_alarm_time")) {
+                val alarmTime = responseObject.getString("special_alarm_time")
 
-                val formatted_time = String.format("%02d", current_hours) + ":" + String.format("%02d", current_mins)
+                val parts = alarmTime.split(":".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                val currentHours = Integer.parseInt(parts[0])
+                val currentMins = Integer.parseInt(parts[1])
 
-                alarm_time_text.setText(formatted_time)
+                val formattedTime = String.format("%02d", currentHours) + ":" + String.format("%02d", currentMins)
+
+                alarm_time_text.text = formattedTime
             }
-            if (`object`.has("special_alarm_lead")) {
-                val response_alarm_lead = `object`.getInt("special_alarm_lead")
-                alarm_lead!!.setText(response_alarm_lead.toString())
+            if (responseObject.has("special_alarm_lead")) {
+                val responseAlarmLead = responseObject.getInt("special_alarm_lead")
+                alarm_lead!!.setText(responseAlarmLead.toString())
             }
-            if (`object`.has("special_alarm_tail")) {
-                val response_alarm_tail = `object`.getInt("special_alarm_tail")
-                alarm_tail!!.setText(response_alarm_tail.toString())
+            if (responseObject.has("special_alarm_tail")) {
+                val responseAlarmTail = responseObject.getInt("special_alarm_tail")
+                alarm_tail!!.setText(responseAlarmTail.toString())
             }
-            if (`object`.has("special_alarm_status")) {
-                val response_alarm_status = `object`.getInt("special_alarm_status")
-                if (response_alarm_status == 1) {
-                    alarm_status.text = alarm_status_active
-                    alarm_status.setTextColor(status_active)
+            if (responseObject.has("special_alarm_status")) {
+                val responseAlarmStatus = responseObject.getInt("special_alarm_status")
+                if (responseAlarmStatus == 1) {
+                    alarm_status.text = alarmStatusActive
+                    alarm_status.setTextColor(statusActive)
                 } else {
-                    alarm_status.text = alarm_status_inactive
-                    alarm_status.setTextColor(status_inactive)
+                    alarm_status.text = alarmStatusInactive
+                    alarm_status.setTextColor(statusInactive)
                 }
             }
-            if (`object`.has("special_fade_minutes")) {
-                val response_fade_minutes = `object`.getInt("special_fade_minutes")
-                fade_time!!.setText(response_fade_minutes.toString())
+            if (responseObject.has("special_fade_minutes")) {
+                val responseFadeMinutes = responseObject.getInt("special_fade_minutes")
+                fade_time!!.setText(responseFadeMinutes.toString())
             }
-            if (`object`.has("special_fade_target")) {
-                val response_fade_target = `object`.getString("special_fade_target")
-                val fade_percent = Math.round(java.lang.Float.parseFloat(response_fade_target) * 100)
-                fade_target_seekbar!!.progress = fade_percent
+            if (responseObject.has("special_fade_target")) {
+                val responseFadeTarget = responseObject.getString("special_fade_target")
+                val fadePercent = Math.round(java.lang.Float.parseFloat(responseFadeTarget) * 100)
+                fade_target_seekbar!!.progress = fadePercent
             }
-            if (`object`.has("special_fade_status")) {
-                val response_alarm_status = `object`.getInt("special_fade_status")
-                if (response_alarm_status == 1) {
-                    fade_status.text = fade_status_active
-                    fade_status.setTextColor(status_active)
+            if (responseObject.has("special_fade_status")) {
+                val responseAlarmStatus = responseObject.getInt("special_fade_status")
+                if (responseAlarmStatus == 1) {
+                    fade_status.text = fadeStatusActive
+                    fade_status.setTextColor(statusActive)
                 } else {
-                    fade_status.text = fade_status_inactive
-                    fade_status.setTextColor(status_inactive)
+                    fade_status.text = fadeStatusInactive
+                    fade_status.setTextColor(statusInactive)
                 }
             }
 
@@ -275,8 +285,8 @@ class ItemOneFragment : Fragment() {
 
     companion object {
         fun newInstance(): ItemOneFragment {
-            var fragmentHome = ItemOneFragment()
-            var args = Bundle()
+            val fragmentHome = ItemOneFragment()
+            val args = Bundle()
             fragmentHome.arguments = args
             return fragmentHome
         }

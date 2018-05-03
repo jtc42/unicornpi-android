@@ -38,8 +38,8 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
-    // Set up frame_layout object
-    private var frame_layout: FrameLayout? = null
+    // Set up frameLayout object
+    private var frameLayout: FrameLayout? = null
 
     // Generate the API base URL from preferences
     // Handle preferences and API URL
@@ -48,9 +48,8 @@ class MainActivity : AppCompatActivity() {
             val pref = PreferenceManager.getDefaultSharedPreferences(this)
 
             val deviceIP = pref.getString("prefs_device_ip", "0.0.0.0")
-            val devicePort = pref.getString("prefs_device_port", "5000")
             val apiVersion = pref.getString("prefs_api_version", "1.0")
-            return "http://$deviceIP:$devicePort/api/$apiVersion/"
+            return "http://$deviceIP/api/$apiVersion/"
         }
 
 
@@ -59,8 +58,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // POopulate frame_layout object
-        frame_layout = findViewById(R.id.frame_layout) as FrameLayout
+        // Populate frameLayout object
+        frameLayout = findViewById(R.id.frame_layout)
 
         //Set up bottom navigation bar and populate
 

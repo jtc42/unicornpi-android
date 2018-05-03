@@ -6,7 +6,7 @@
     tools:context="com.joeltcollins.unicornpi.ItemTwoFragment">
 
     <RelativeLayout
-        android:id="@+id/system_progressLayout"
+        android:id="@+id/system_progress_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="15dp"
@@ -20,7 +20,7 @@
     </RelativeLayout>
 
     <ScrollView
-        android:id="@+id/system_mainLayout"
+        android:id="@+id/system_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">

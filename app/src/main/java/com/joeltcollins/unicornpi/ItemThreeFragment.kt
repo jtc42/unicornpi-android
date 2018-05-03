@@ -39,15 +39,17 @@ class ItemThreeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         //Get current view
-        val v = inflater.inflate(R.layout.fragment_item_three, container, false)
+        return inflater.inflate(R.layout.fragment_item_three, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //RAINBOW START BUTTON LISTENER & FUNCTIONS
         rainbow_start_button.setOnClickListener {
-            val spinner_position = rainbow_theme_spinner.selectedItemPosition
-            val speed_pc = rainbow_speed_seekbar.progress
-            val speed = (speed_pc + 1) / 100.toFloat()
+            val spinnerPosition = rainbow_theme_spinner.selectedItemPosition
+            val speedPercent = rainbow_speed_seekbar.progress
+            val speed = (speedPercent + 1) / 100.toFloat()
 
-            RetrieveFeedTask(v, "rainbow/set?mode=${spinner_position.toString()}&speed=${speed.toString()}&status=1", true).execute()
+            RetrieveFeedTask("rainbow/set?mode=$spinnerPosition&speed=$speed&status=1", true).execute()
         }
 
         //ALSA START BUTTON LISTENER & FUNCTIONS
@@ -57,30 +59,28 @@ class ItemThreeFragment : Fragment() {
             val mic = alsa_mic_seekbar.progress
             val vol = alsa_vol_seekbar.progress
 
-            RetrieveFeedTask(v, "alsa/set?mode=${spinner_position.toString()}&sensitivity=${sensitivity.toString()}&monitor=${mic.toString()}&volume=${vol.toString()}&status=1", true).execute()
+            RetrieveFeedTask("alsa/set?mode=$spinner_position&sensitivity=$sensitivity&monitor=$mic&volume=$vol&status=1", true).execute()
         }
 
-
         //GET API RESPONSE FOR UI STARTUP
-        RetrieveFeedTask(v, "status/all", true).execute()
+        RetrieveFeedTask("status/all", true).execute()
 
-        return v
     }
 
+
     //RETREIVEFEED CLASS
-    internal inner class RetrieveFeedTask(rootView: View,
-                                          private val api_arg: String,
+    internal inner class RetrieveFeedTask(private val api_arg: String,
                                           private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
 
         //Get mainactivity for sending snackbars etc
-        val activity: MainActivity = getActivity() as MainActivity
+        private val activity: MainActivity = getActivity() as MainActivity
 
         //Before executing asynctask
         override fun onPreExecute() {
             //Show progressbars, hide content
             if (show_progress) {
-                anim_progressLayout.visibility = View.VISIBLE
-                anim_mainLayout.visibility = View.GONE
+                anim_progress_layout.visibility = View.VISIBLE
+                anim_main_layout.visibility = View.GONE
             }
         }
 
@@ -102,8 +102,8 @@ class ItemThreeFragment : Fragment() {
 
             //Hide progressbar, show content
             if (show_progress) {
-                anim_progressLayout.visibility = View.GONE
-                anim_mainLayout.visibility = View.VISIBLE
+                anim_progress_layout.visibility = View.GONE
+                anim_main_layout.visibility = View.VISIBLE
             }
 
         }
@@ -112,39 +112,39 @@ class ItemThreeFragment : Fragment() {
     //HANDLE JSON RESPONSE
     private fun handleResponse(response: String) {
         try {
-            val `object` = JSONTokener(response).nextValue() as JSONObject
-            if (`object`.has("dynamic_rainbow_mode")) {
-                val response_rainbow_mode = `object`.getInt("dynamic_rainbow_mode")
-                rainbow_theme_spinner.setSelection(response_rainbow_mode)
+            val responseObject = JSONTokener(response).nextValue() as JSONObject
+            if (responseObject.has("dynamic_rainbow_mode")) {
+                val responseRainbowMode = responseObject.getInt("dynamic_rainbow_mode")
+                rainbow_theme_spinner.setSelection(responseRainbowMode)
             }
-            if (`object`.has("dynamic_rainbow_speed")) {
-                val response_rainbow_speed = `object`.getString("dynamic_rainbow_speed")
-                val speed_pc = Math.round(java.lang.Float.parseFloat(response_rainbow_speed) * 100) - 1
-                rainbow_speed_seekbar.progress = speed_pc
+            if (responseObject.has("dynamic_rainbow_speed")) {
+                val responseRainbowSpeed = responseObject.getString("dynamic_rainbow_speed")
+                val speedPercent = Math.round(java.lang.Float.parseFloat(responseRainbowSpeed) * 100) - 1
+                rainbow_speed_seekbar.progress = speedPercent
             }
-            if (`object`.has("dynamic_alsa_enabled")) {
-                val response_alsa_enabled = `object`.getInt("dynamic_alsa_enabled")
-                if (response_alsa_enabled == 0) {
+            if (responseObject.has("dynamic_alsa_enabled")) {
+                val responseAlsaEnabled = responseObject.getInt("dynamic_alsa_enabled")
+                if (responseAlsaEnabled == 0) {
                     card_anim_alsa.visibility = View.GONE
                 } else {
                     card_anim_alsa.visibility = View.VISIBLE
                 }
             }
-            if (`object`.has("dynamic_alsa_mode")) {
-                val response_alsa_mode = `object`.getInt("dynamic_alsa_mode")
-                alsa_theme_spinner.setSelection(response_alsa_mode)
+            if (responseObject.has("dynamic_alsa_mode")) {
+                val responseAlsaMode = responseObject.getInt("dynamic_alsa_mode")
+                alsa_theme_spinner.setSelection(responseAlsaMode)
             }
-            if (`object`.has("dynamic_alsa_sensitivity")) {
-                val response_alsa_sensitivity = `object`.getInt("dynamic_alsa_sensitivity")
-                alsa_sensitivity_seekbar.progress = response_alsa_sensitivity * 10
+            if (responseObject.has("dynamic_alsa_sensitivity")) {
+                val responseAlsaSensitivity = responseObject.getInt("dynamic_alsa_sensitivity")
+                alsa_sensitivity_seekbar.progress = responseAlsaSensitivity * 10
             }
-            if (`object`.has("dynamic_alsa_monitor")) {
-                val response_alsa_mic = `object`.getInt("dynamic_alsa_monitor")
-                alsa_mic_seekbar.progress = response_alsa_mic
+            if (responseObject.has("dynamic_alsa_monitor")) {
+                val responseAlsaMic = responseObject.getInt("dynamic_alsa_monitor")
+                alsa_mic_seekbar.progress = responseAlsaMic
             }
-            if (`object`.has("dynamic_alsa_volume")) {
-                val response_alsa_vol = `object`.getInt("dynamic_alsa_volume")
-                alsa_vol_seekbar.progress = response_alsa_vol
+            if (responseObject.has("dynamic_alsa_volume")) {
+                val responseAlsaVol = responseObject.getInt("dynamic_alsa_volume")
+                alsa_vol_seekbar.progress = responseAlsaVol
             }
 
         } catch (e: JSONException) {

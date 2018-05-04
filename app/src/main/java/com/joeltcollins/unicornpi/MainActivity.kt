@@ -36,6 +36,8 @@ import android.widget.FrameLayout
 
 import java.net.URL
 
+// TODO: Move generic async task to MainActivity. MainActivity to have loading widget, rather than separate for each fragment
+
 // TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
 
 class MainActivity : AppCompatActivity() {

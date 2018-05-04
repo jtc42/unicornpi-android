@@ -29,8 +29,9 @@ import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
-import android.os.AsyncTask
 import kotlinx.android.synthetic.main.fragment_item_two.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 
 class ItemTwoFragment : Fragment() {
@@ -47,75 +48,64 @@ class ItemTwoFragment : Fragment() {
         color_picker_view.addOnColorSelectedListener { selectedColor ->
             //RGB hex string of selected color
             val hexString = Integer.toHexString(selectedColor).toUpperCase().substring(2, 8)
-            RetrieveFeedTask("clamp/set?hex=$hexString&status=1", false).execute()
+            retreiveAsync("clamp/set?hex=$hexString&status=1", false)
         }
 
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_night.setOnClickListener {
-            RetrieveFeedTask("clamp/set?hex=ff880d&status=1", false).execute()
+            retreiveAsync("clamp/set?hex=ff880d&status=1", false)
             //activity.showSnack("Night lamp started");
         }
 
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_evening.setOnClickListener {
-            RetrieveFeedTask("clamp/set?hex=ff9f46&status=1", false).execute()
+            retreiveAsync("clamp/set?hex=ff9f46&status=1", false)
             //activity.showSnack("Evening lamp started");
         }
 
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_desk.setOnClickListener {
-            RetrieveFeedTask("clamp/set?hex=ffc08c&status=1", false).execute()
+            retreiveAsync("clamp/set?hex=ffc08c&status=1", false)
             //activity.showSnack("Desk lamp started");
         }
 
         //ALARM START BUTTON LISTENER & FUNCTIONS
         clamp_button_day.setOnClickListener {
-            RetrieveFeedTask("clamp/set?hex=ffe4cd&status=1", false).execute()
+            retreiveAsync("clamp/set?hex=ffe4cd&status=1", false)
             //activity.showSnack("Day lamp started");
         }
 
         //GET API RESPONSE FOR UI STARTUP
-        RetrieveFeedTask("status/all", true).execute()
+        retreiveAsync("status/all", true)
 
     }
 
 
-    //RETREIVEFEED CLASS
-    internal inner class RetrieveFeedTask(private val api_arg: String,
-                                          private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
+    // Get and process HTTP response in a coroutine
+    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        val activity: MainActivity = activity as MainActivity
 
-        //Get mainactivity for sending snackbars etc
-        private val activity: MainActivity = getActivity() as MainActivity
-
-        //Before executing asynctask
-        override fun onPreExecute() {
-            //Show progressbars, hide content
-            if (show_progress) {
-                activity.toggleLoader(true)
-            }
+        // Start loader
+        if (show_progress) {
+            activity.toggleLoader(true)
         }
 
-        //Main asynctask
-        override fun doInBackground(vararg params: Void): String? {
-            return activity.getFromURL(activity.apiBase + api_arg)
-        }
+        launch{
 
-        //After executing asynctask
-        override fun onPostExecute(response: String?) {
-            if (response == null) {
-                activity.showSnack("Error when parsing response")
-            } else {
-                //Call function to handle response string, only if response not null
-                handleResponse(response)
-                //Log response to debug terminal
-                Log.i("INFO", response)
+            // Suspend while data is obtained
+            val response: String? = activity.suspendedGetFromURL(activity.apiBase + api_arg)
+
+            launch(UI) { // launch coroutine in UI context
+                if (response != null) {
+                    //Call function to handle response string, only if response not null
+                    handleResponse(response)
+                    // Stop loader
+                    if (show_progress) {
+                        activity.toggleLoader(false)
+                    }
+                }
+
             }
-
-            //Hide progressbar, show content
-            if (show_progress) {
-                activity.toggleLoader(false)
-            }
-
         }
     }
 

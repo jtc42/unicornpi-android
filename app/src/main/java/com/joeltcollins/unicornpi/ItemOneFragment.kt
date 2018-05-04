@@ -33,10 +33,11 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import android.os.AsyncTask
 import kotlinx.android.synthetic.main.fragment_item_one.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 
 class ItemOneFragment : Fragment() {
-
 
     // While creating view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -154,10 +155,54 @@ class ItemOneFragment : Fragment() {
         // GET API RESPONSE FOR UI STARTUP
         // Happens here because post-execute uses UI elements
         // RetrieveFeedTask("status/all", true).execute()
-        RetrieveFeedTask("status/all", true).execute()
+        //RetrieveFeedTask("status/all", true).execute()
+        //testAsync("hello world")
+        retreiveAsync("status/all", true)
 
     }
 
+
+    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        val activity: MainActivity = activity as MainActivity
+
+        // Start loader
+        if (show_progress) {
+            activity.toggleLoader(true)
+        }
+
+        launch{
+
+            // Suspend while data is obtained
+            var response: String? = activity.suspendedGetFromURL(activity.apiBase + api_arg)
+
+            launch(UI) { // launch coroutine in UI context
+                // Handle response
+                if (response == null) {
+                    activity.showSnack("Error when parsing response")
+                } else {
+                    //Call function to handle response string, only if response not null
+                    handleResponse(response)
+                    //Log response to debug terminal
+                    Log.i("INFO", response)
+                }
+
+                // Stop loader
+                if (show_progress) {
+                    activity.toggleLoader(false)
+                }
+            }
+        }
+    }
+
+    // TODO: Remove
+    private fun testAsync(note_string: String){
+        val activity: MainActivity = activity as MainActivity
+
+        launch(UI) { // launch coroutine in UI context
+            var notificationString: String = activity.testSuspend(note_string)
+            activity.showSnack(notificationString)
+        }
+    }
 
     //RETREIVEFEED CLASS
     // TODO: See if this can be moved into MainActivity, calling fragments handleResponse

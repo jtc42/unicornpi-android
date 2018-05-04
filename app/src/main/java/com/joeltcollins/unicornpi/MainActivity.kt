@@ -34,6 +34,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.experimental.delay
 
 import java.net.URL
 
@@ -141,6 +142,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Return string of content returned from a URL
+    suspend fun suspendedGetFromURL(url_string: String): String? {
+        return try {
+            URL(url_string).readText() //
+        } catch (e: Exception) {
+            // TODO: Actually handle error properly
+            // Log any errors
+            Log.e("ERROR", e.message, e)
+            //If connection failed, return null string
+            null
+        }
+    }
+
+    // TODO: Remove
+    suspend fun testSuspend(note_string: String): String {
+        //delay(500)
+        return note_string
+    }
+
     //GUI SETUP FUNCTIONS
     //Expand the main menu into the menu bar
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -170,6 +190,7 @@ class MainActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
 
     //BASIC EMPTY RETREIVEFEED CLASS (ONLY USED FOR CLEARING, SHUTDOWN ETC WHERE NO GUI NEEDED)
     internal inner class RetrieveFeedTask(private val api_arg: String) : AsyncTask<Void, Void, String>() {

@@ -91,8 +91,7 @@ class ItemTwoFragment : Fragment() {
         override fun onPreExecute() {
             //Show progressbars, hide content
             if (show_progress) {
-                clamp_progress_layout.visibility = View.VISIBLE
-                clamp_main_layout.visibility = View.GONE
+                activity.toggleLoader(true)
             }
         }
 
@@ -114,8 +113,7 @@ class ItemTwoFragment : Fragment() {
 
             //Hide progressbar, show content
             if (show_progress) {
-                clamp_progress_layout.visibility = View.GONE
-                clamp_main_layout.visibility = View.VISIBLE
+                activity.toggleLoader(false)
             }
 
         }

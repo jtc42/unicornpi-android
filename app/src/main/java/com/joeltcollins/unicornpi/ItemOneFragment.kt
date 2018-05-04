@@ -28,6 +28,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.TextView
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -36,13 +37,10 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
-interface JobHolder {
-    var job: Job
-}
 
-class ItemOneFragment : Fragment(), JobHolder {
+class ItemOneFragment : Fragment() {
 
-    override var job: Job = Job() // the instance of a Job for this activity
+    private var brightnessSeekbar: SeekBar? = null
 
     // While creating view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +53,9 @@ class ItemOneFragment : Fragment(), JobHolder {
 
     // Once view has been inflated/created
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        // Grab UI elements
+        brightnessSeekbar = brightness_seekbar
 
         //Grab resources from XML
         val fadeStatusActive: String = getString(R.string.fade_status_active)
@@ -163,12 +164,6 @@ class ItemOneFragment : Fragment(), JobHolder {
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.i("INFO", "Cancelling job")
-        this.job.cancel() // cancel the job when activity is destroyed
-    }
-
 
     // Get and process HTTP response in a coroutine
     private fun retreiveAsync(api_arg: String, show_progress: Boolean){
@@ -179,7 +174,7 @@ class ItemOneFragment : Fragment(), JobHolder {
             activity.toggleLoader(true)
         }
 
-        job = launch{
+        launch{
 
             // Suspend while data is obtained
             val response: String? = activity.suspendedGetFromURL(activity.apiBase + api_arg)
@@ -225,7 +220,7 @@ class ItemOneFragment : Fragment(), JobHolder {
             if (responseObject.has("global_brightness_val")) {
                 val responseBrightnessVal = responseObject.getInt("global_brightness_val")
                 if (updateBrightnessSlider) {
-                    brightness_seekbar!!.progress = responseBrightnessVal
+                    brightnessSeekbar?.progress = responseBrightnessVal
                 }
             }
 

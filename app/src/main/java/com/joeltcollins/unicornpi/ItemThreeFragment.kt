@@ -79,8 +79,7 @@ class ItemThreeFragment : Fragment() {
         override fun onPreExecute() {
             //Show progressbars, hide content
             if (show_progress) {
-                anim_progress_layout.visibility = View.VISIBLE
-                anim_main_layout.visibility = View.GONE
+                activity.toggleLoader(true)
             }
         }
 
@@ -102,8 +101,7 @@ class ItemThreeFragment : Fragment() {
 
             //Hide progressbar, show content
             if (show_progress) {
-                anim_progress_layout.visibility = View.GONE
-                anim_main_layout.visibility = View.VISIBLE
+                activity.toggleLoader(false)
             }
 
         }

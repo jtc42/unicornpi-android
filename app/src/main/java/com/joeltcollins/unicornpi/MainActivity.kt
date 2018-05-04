@@ -33,6 +33,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import kotlinx.android.synthetic.main.activity_main.*
 
 import java.net.URL
 
@@ -104,10 +105,22 @@ class MainActivity : AppCompatActivity() {
     private fun addFragment(fragment: Fragment) {
         supportFragmentManager
                 .beginTransaction()
-                .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                // .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
                 .replace(R.id.frame_layout, fragment, fragment.javaClass.simpleName)
                 .addToBackStack(fragment.javaClass.simpleName)
                 .commit()
+    }
+
+    // Toggle loading spinner
+    fun toggleLoader(isLoading: Boolean){
+        if (isLoading) {
+            progress_layout.visibility = View.VISIBLE
+            frame_layout.visibility = View.GONE
+        }
+        else {
+            progress_layout.visibility = View.GONE
+            frame_layout.visibility = View.VISIBLE
+        }
     }
 
     //Show a snack, with message passed as an argument

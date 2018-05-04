@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     tools:context="com.joeltcollins.unicornpi.MainActivity">
 
+    <RelativeLayout
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/navigation"
+        android:animateLayoutChanges="false"
+        android:visibility="visible">
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="72dp" />
+    </RelativeLayout>
+
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"

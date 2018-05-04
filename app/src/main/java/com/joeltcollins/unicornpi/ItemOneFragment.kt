@@ -32,7 +32,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
 import android.os.AsyncTask
-
 import kotlinx.android.synthetic.main.fragment_item_one.*
 
 
@@ -154,13 +153,15 @@ class ItemOneFragment : Fragment() {
 
         // GET API RESPONSE FOR UI STARTUP
         // Happens here because post-execute uses UI elements
+        // RetrieveFeedTask("status/all", true).execute()
         RetrieveFeedTask("status/all", true).execute()
 
     }
 
 
     //RETREIVEFEED CLASS
-    // TODO: Better, more Kotlin-y async task in all fragments, fixing AsyncTask leak warning
+    // TODO: See if this can be moved into MainActivity, calling fragments handleResponse
+    // TODO: Fix AsyncTask leak warning
     internal inner class RetrieveFeedTask(private val api_arg: String,
                                           private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
 
@@ -171,8 +172,7 @@ class ItemOneFragment : Fragment() {
         override fun onPreExecute() {
             //Show progressbars, hide content
             if (show_progress) {
-                system_progress_layout.visibility = View.VISIBLE
-                system_main_layout.visibility = View.GONE
+                activity.toggleLoader(true)
             }
         }
 
@@ -194,8 +194,7 @@ class ItemOneFragment : Fragment() {
 
             //Hide progressbar, show content
             if (show_progress) {
-                system_progress_layout.visibility = View.GONE
-                system_main_layout.visibility = View.VISIBLE
+                activity.toggleLoader(false)
             }
 
         }

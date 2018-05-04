@@ -108,13 +108,14 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         String device_ip = pref.getString("prefs_device_ip", "0.0.0.0");
-        String device_port = pref.getString("prefs_device_port", "5000");
         String api_version = pref.getString("prefs_api_version", "1.0");
-        return "http://"+device_ip+":"+device_port+"/api/"+api_version+"/";
+        Log.i("INFO", "http://"+device_ip+"/api/"+api_version+"/");
+        return "http://"+device_ip+"/api/"+api_version+"/";
     }
 
     // Return string of content returned from a URL
     public String getFromURL(String url_string) {
+        Log.i("INFO", url_string);
         try {
             //Set up URL from arguments and root
             URL url = new URL(url_string);

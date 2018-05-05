@@ -4,7 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.joeltcollins.unicornpi.MainActivity">
+    tools:context="com.joeltcollins.unicornpi.MainActivity"
+    android:animateLayoutChanges="true">
+
+    <RelativeLayout
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/navigation"
+        android:animateLayoutChanges="false"
+        android:visibility="visible">
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="72dp" />
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/frame_layout"
@@ -12,7 +28,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/navigation"
         android:animateLayoutChanges="false">
-
+        <!-- Gets replaced by fragment -->
     </FrameLayout>
 
     <android.support.design.widget.CoordinatorLayout
@@ -21,10 +37,8 @@
         android:id="@+id/placeSnackBar"
         android:layout_above="@id/navigation"
         android:animateLayoutChanges="false">
-
         <!-- Any elements like FAB that should move in response to snackbar should go inside here!
         Change animateLayoutChanges to true for smooth FAB slides-->
-
     </android.support.design.widget.CoordinatorLayout>
 
     <View

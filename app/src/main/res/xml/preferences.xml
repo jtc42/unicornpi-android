@@ -5,11 +5,10 @@
         android:defaultValue="192.168.0.3:5000"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Device IP or hostname"
+        android:title="Device IP or hostname, including port"
         android:inputType="text"
         android:key="prefs_device_ip"
-        android:summary="Local IP address or .local hostname of the device, including port" />
-
+        android:summary="Local IP address or .local hostname of the device, including its port" />
 
     <EditTextPreference
         android:defaultValue="1.0"

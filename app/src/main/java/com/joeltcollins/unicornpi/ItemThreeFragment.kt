@@ -20,17 +20,22 @@
 
 package com.joeltcollins.unicornpi
 
-import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_item_three.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
+
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+
+import kotlinx.android.synthetic.main.fragment_item_three.*
 
 
 class ItemThreeFragment : Fragment() {
@@ -49,61 +54,49 @@ class ItemThreeFragment : Fragment() {
             val speedPercent = rainbow_speed_seekbar.progress
             val speed = (speedPercent + 1) / 100.toFloat()
 
-            RetrieveFeedTask("rainbow/set?mode=$spinnerPosition&speed=$speed&status=1", true).execute()
+            retreiveAsync("rainbow/set?mode=$spinnerPosition&speed=$speed&status=1", true)
         }
 
         //ALSA START BUTTON LISTENER & FUNCTIONS
         alsa_start_button.setOnClickListener {
-            val spinner_position = alsa_theme_spinner.selectedItemPosition
+            val spinnerPosition = alsa_theme_spinner.selectedItemPosition
             val sensitivity = alsa_sensitivity_seekbar.progress / 10
             val mic = alsa_mic_seekbar.progress
             val vol = alsa_vol_seekbar.progress
 
-            RetrieveFeedTask("alsa/set?mode=$spinner_position&sensitivity=$sensitivity&monitor=$mic&volume=$vol&status=1", true).execute()
+            retreiveAsync("alsa/set?mode=$spinnerPosition&sensitivity=$sensitivity&monitor=$mic&volume=$vol&status=1", true)
         }
 
         //GET API RESPONSE FOR UI STARTUP
-        RetrieveFeedTask("status/all", true).execute()
+        retreiveAsync("status/all", true)
 
     }
 
 
-    //RETREIVEFEED CLASS
-    internal inner class RetrieveFeedTask(private val api_arg: String,
-                                          private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
+    // Get and process HTTP response in a coroutine
+    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        val activity: MainActivity = activity as MainActivity
 
-        //Get mainactivity for sending snackbars etc
-        private val activity: MainActivity = getActivity() as MainActivity
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-        //Before executing asynctask
-        override fun onPreExecute() {
-            //Show progressbars, hide content
-            if (show_progress) {
-                activity.toggleLoader(true)
+            // Start loader
+            if (show_progress) {activity.toggleLoader(true)}
+
+            // Suspend while data is obtained
+            val response = async(CommonPool) {
+                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+            }.await()
+
+            //Call function to handle response string, only if response not null
+            if (response != null) {
+                // If fragment layout is not null (ie. fragment still in view), handle response
+                if (frag_layout != null) {handleResponse(response)}
+                // Else log that handling has been aborted
+                else {Log.i("INFO", "Response processing aborted")}
+                // Stop loader
+                if (show_progress) {activity.toggleLoader(false)}
             }
-        }
-
-        //Main asynctask
-        override fun doInBackground(vararg params: Void): String? {
-            return activity.getFromURL(activity.apiBase + api_arg)
-        }
-
-        //After executing asynctask
-        override fun onPostExecute(response: String?) {
-            if (response == null) {
-                activity.showSnack("Error when parsing response")
-            } else {
-                //Call function to handle response string, only if response not null
-                handleResponse(response)
-                //Log response to debug terminal
-                Log.i("INFO", response)
-            }
-
-            //Hide progressbar, show content
-            if (show_progress) {
-                activity.toggleLoader(false)
-            }
-
         }
     }
 

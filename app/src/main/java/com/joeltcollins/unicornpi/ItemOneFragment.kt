@@ -31,7 +31,12 @@ import android.widget.SeekBar
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
-import android.os.AsyncTask
+
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+
 import kotlinx.android.synthetic.main.fragment_item_one.*
 
 
@@ -61,9 +66,9 @@ class ItemOneFragment : Fragment() {
 
             override fun onProgressChanged(seekBar: SeekBar, progresValue: Int, fromUser: Boolean) {
                 progress = progresValue
-                brightness_text.text = Integer.toString(progress)
+                brightness_text.text = "$progress"
                 if (fromUser) { //Blocks API call if UI is just updating (caused fades to stop on app load)
-                    RetrieveFeedTask("brightness/set?val=$progress", false).execute()
+                    retreiveAsync("brightness/set?val=$progress", false)
                 }
                 if (fade_status.text.toString() == fadeStatusActive) {
                     fade_status.text = fadeStatusInactive
@@ -76,7 +81,7 @@ class ItemOneFragment : Fragment() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                RetrieveFeedTask("brightness/set?val=$progress", false).execute()
+                retreiveAsync("brightness/set?val=$progress", false)
                 //activity.showSnack("Brightness set");
             }
         })
@@ -92,7 +97,7 @@ class ItemOneFragment : Fragment() {
                 val minutes = Integer.parseInt(fade_time!!.text.toString())
                 val target = fade_target_seekbar!!.progress / 100.toFloat()
 
-                RetrieveFeedTask("fade/set?minutes=$minutes&target=$target&status=1", false).execute()
+                retreiveAsync("fade/set?minutes=$minutes&target=$target&status=1", false)
             }
         })
 
@@ -104,7 +109,7 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Fade stopped")
-                RetrieveFeedTask("fade/set?&status=0", false).execute()
+                retreiveAsync("fade/set?&status=0", false)
             }
         })
 
@@ -135,7 +140,7 @@ class ItemOneFragment : Fragment() {
                 val tail = Integer.parseInt(alarm_tail.text.toString())
                 val time = alarm_time_text.text.toString()
 
-                RetrieveFeedTask("alarm/set?lead=$lead&tail=$tail&time=$time&status=1", false).execute()
+                retreiveAsync("alarm/set?lead=$lead&tail=$tail&time=$time&status=1", false)
             }
         })
 
@@ -147,58 +152,44 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm unset")
-                RetrieveFeedTask("alarm/set?&status=0", false).execute()
+                retreiveAsync("alarm/set?&status=0", false)
             }
         })
 
         // GET API RESPONSE FOR UI STARTUP
         // Happens here because post-execute uses UI elements
-        // RetrieveFeedTask("status/all", true).execute()
-        RetrieveFeedTask("status/all", true).execute()
+        retreiveAsync("status/all", true)
 
     }
 
 
-    //RETREIVEFEED CLASS
-    // TODO: See if this can be moved into MainActivity, calling fragments handleResponse
-    // TODO: Fix AsyncTask leak warning
-    internal inner class RetrieveFeedTask(private val api_arg: String,
-                                          private val show_progress: Boolean) : AsyncTask<Void, Void, String>() {
+    // Get and process HTTP response in a coroutine
+    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        val activity: MainActivity = activity as MainActivity
 
-        //Get mainactivity for sending snackbars etc
-        private val activity: MainActivity = getActivity() as MainActivity
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-        //Before executing asynctask
-        override fun onPreExecute() {
-            //Show progressbars, hide content
-            if (show_progress) {
-                activity.toggleLoader(true)
+            // Start loader
+            if (show_progress) {activity.toggleLoader(true)}
+
+            // Suspend while data is obtained
+            val response = async(CommonPool) {
+                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+            }.await()
+
+            //Call function to handle response string, only if response not null
+            if (response != null) {
+                // If fragment layout is not null (ie. fragment still in view), handle response
+                if (frag_layout != null) {handleResponse(response)}
+                // Else log that handling has been aborted
+                else {Log.i("INFO", "Response processing aborted")}
+                // Stop loader
+                if (show_progress) {activity.toggleLoader(false)}
             }
-        }
-
-        //Main asynctask
-        override fun doInBackground(vararg params: Void): String? {
-            return activity.getFromURL(activity.apiBase + api_arg)
-        }
-
-        //After executing asynctask
-        override fun onPostExecute(response: String?) {
-            if (response == null) {
-                activity.showSnack("Error when parsing response")
-            } else {
-                //Call function to handle response string, only if response not null
-                handleResponse(response)
-                //Log response to debug terminal
-                Log.i("INFO", response)
-            }
-
-            //Hide progressbar, show content
-            if (show_progress) {
-                activity.toggleLoader(false)
-            }
-
         }
     }
+
 
     //HANDLE JSON RESPONSE
     private fun handleResponse(response: String) {
@@ -223,7 +214,7 @@ class ItemOneFragment : Fragment() {
             if (responseObject.has("global_brightness_val")) {
                 val responseBrightnessVal = responseObject.getInt("global_brightness_val")
                 if (updateBrightnessSlider) {
-                    brightness_seekbar!!.progress = responseBrightnessVal
+                    brightness_seekbar.progress = responseBrightnessVal
                 }
             }
 

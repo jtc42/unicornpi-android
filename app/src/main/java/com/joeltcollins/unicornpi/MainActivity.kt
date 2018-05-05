@@ -21,9 +21,9 @@
 package com.joeltcollins.unicornpi
 
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.design.R.*
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -33,11 +33,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import kotlinx.android.synthetic.main.activity_main.*
 
 import java.net.URL
 
-// TODO: Move generic async task to MainActivity. MainActivity to have loading widget, rather than separate for each fragment
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+
+import kotlinx.android.synthetic.main.activity_main.*
 
 // TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
 
@@ -94,18 +98,52 @@ class MainActivity : AppCompatActivity() {
             // Create a string 'intentArgument' based on intent extra 'TEXT'
             val intentArgument = bnd.get("android.intent.extra.TEXT") as String
             // Run async call to intentArgument URL
-            RetrieveFeedTask(intentArgument).execute()
+            retreiveAsync(intentArgument, true)
         }
 
     }
 
-    //BASIC FUNCTIONALITY
+    //GUI SETUP FUNCTIONS
+    //Expand the main menu into the menu bar
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-    //add/replace fragment in container [framelayout]
+    //Map menu items to functions
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle item selection
+        when (item.itemId) {
+            R.id.menu_main_clear -> {
+                retreiveAsync("status/clear", false)
+                return true
+            }
+            R.id.menu_main_settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
+                startActivity(i)
+                return true
+            }
+            R.id.menu_main_about -> {
+                val versionName = BuildConfig.VERSION_NAME
+                showSnack("Unicorn Pi for Android, version $versionName")
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+
+    // BASIC FUNCTIONALITY
+    // add/replace fragment in container [framelayout]
     private fun addFragment(fragment: Fragment) {
+        // Hide fragment layout during transaction, while loading spinner activates
+        toggleLoader(true)
+        // Create fragment
         supportFragmentManager
                 .beginTransaction()
-                // .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                // TODO: Fix references to private animation. Use android.R.anim, or copy anim XML
+                .setCustomAnimations(R.anim.abc_fade_in, R.anim.design_bottom_sheet_slide_out)
                 .replace(R.id.frame_layout, fragment, fragment.javaClass.simpleName)
                 .addToBackStack(fragment.javaClass.simpleName)
                 .commit()
@@ -129,11 +167,15 @@ class MainActivity : AppCompatActivity() {
                     .show()
 
     // Return string of content returned from a URL
-    fun getFromURL(url_string: String): String? {
+    fun suspendedGetFromURL(url_string: String): String? {
         return try {
-            URL(url_string).readText() //
+            val response: String = URL(url_string).readText()
+            // Log successful response
+            Log.i("INFO", "Response obtained from $url_string")
+            // Return response
+            response
         } catch (e: Exception) {
-            // TODO: Actually handle error properly
+            showSnack("Error connecting to device")
             // Log any errors
             Log.e("ERROR", e.message, e)
             //If connection failed, return null string
@@ -141,60 +183,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //GUI SETUP FUNCTIONS
-    //Expand the main menu into the menu bar
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+    // Get and process HTTP response in a coroutine
+    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-    //Map menu items to functions
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        when (item.itemId) {
-            R.id.menu_main_clear -> {
-                RetrieveFeedTask("status/clear").execute()
-                return true
+            // Start loader
+            if (show_progress) {toggleLoader(true)}
+
+            // Suspend while data is obtained
+            val response = async(CommonPool) {
+                suspendedGetFromURL(apiBase + api_arg)
+            }.await()
+
+            //Call function to handle response string, only if response not null
+            if (response != null) {
+                // Stop loader
+                if (show_progress) {toggleLoader(false)}
             }
-            R.id.menu_main_settings -> {
-                val i = Intent(this, SettingsActivity::class.java)
-                startActivity(i)
-                return true
-            }
-            R.id.menu_main_about -> {
-                val versionName = BuildConfig.VERSION_NAME
-                showSnack("Unicorn Pi for Android, version $versionName")
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
         }
     }
 
-    //BASIC EMPTY RETREIVEFEED CLASS (ONLY USED FOR CLEARING, SHUTDOWN ETC WHERE NO GUI NEEDED)
-    internal inner class RetrieveFeedTask(private val api_arg: String) : AsyncTask<Void, Void, String>() {
-
-        //Before executing asynctask
-        override fun onPreExecute() {
-            //Show progressbars, hide content
-        }
-
-        //Main asynctask
-        override fun doInBackground(vararg params: Void): String? {
-            return getFromURL(apiBase + api_arg)
-        }
-
-        //After executing asynctask
-        override fun onPostExecute(response: String?) {
-            if (response == null) {
-                showSnack("Error when parsing response")
-            } else {
-                //Call function to handle response string, only if response not null
-                //Log response to debug terminal
-                Log.i("INFO", response)
-            }
-
-        }
-    }
 
 }

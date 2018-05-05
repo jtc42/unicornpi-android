@@ -6,7 +6,7 @@
     tools:context="com.joeltcollins.unicornpi.ItemTwoFragment">
 
     <ScrollView
-        android:id="@+id/system_main_layout"
+        android:id="@+id/frag_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">

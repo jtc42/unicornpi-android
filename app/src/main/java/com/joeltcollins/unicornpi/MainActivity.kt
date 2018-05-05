@@ -33,7 +33,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 
 import java.net.URL
@@ -136,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     private fun addFragment(fragment: Fragment) {
         supportFragmentManager
                 .beginTransaction()
-                // .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                .setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out)
                 .replace(R.id.frame_layout, fragment, fragment.javaClass.simpleName)
                 .addToBackStack(fragment.javaClass.simpleName)
                 .commit()
@@ -159,12 +161,11 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(findViewById<View>(R.id.placeSnackBar), message, Snackbar.LENGTH_LONG)
                     .show()
 
-
     // Return string of content returned from a URL
-    suspend fun suspendedGetFromURL(url_string: String): String? {
+    fun suspendedGetFromURL(url_string: String): String? {
         return try {
             val response: String = URL(url_string).readText()
-            //Log.i("INFO", response)
+            Log.i("INFO", "Response obtained from $url_string")
             response
         } catch (e: Exception) {
             // TODO: Actually handle error properly
@@ -176,35 +177,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     // Get and process HTTP response in a coroutine
     private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-        // Start loader
-        if (show_progress) {
-            toggleLoader(true)
-        }
-
-        launch{
+            // Start loader
+            if (show_progress) {toggleLoader(true)}
 
             // Suspend while data is obtained
-            val response: String? = suspendedGetFromURL(apiBase + api_arg)
+            val response = async(CommonPool) {
+                suspendedGetFromURL(apiBase + api_arg)
+            }.await()
 
-            launch(UI) { // launch coroutine in UI context
-                // Handle response
-                if (response == null) {
-                    showSnack("Error when parsing response")
-                } else {
-                    //Call function to handle response string, only if response not null
-                    //handleResponse(response)
-                    //Log response to debug terminal
-                    Log.i("INFO", response)
-                }
-
+            //Call function to handle response string, only if response not null
+            if (response != null) {
                 // Stop loader
-                if (show_progress) {
-                    toggleLoader(false)
-                }
+                if (show_progress) {toggleLoader(false)}
             }
         }
     }

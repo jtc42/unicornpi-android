@@ -29,9 +29,13 @@ import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
-import kotlinx.android.synthetic.main.fragment_item_two.*
+
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+
+import kotlinx.android.synthetic.main.fragment_item_two.*
 
 
 class ItemTwoFragment : Fragment() {
@@ -85,26 +89,25 @@ class ItemTwoFragment : Fragment() {
     private fun retreiveAsync(api_arg: String, show_progress: Boolean){
         val activity: MainActivity = activity as MainActivity
 
-        // Start loader
-        if (show_progress) {
-            activity.toggleLoader(true)
-        }
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-        launch{
+            // Start loader
+            if (show_progress) {activity.toggleLoader(true)}
 
             // Suspend while data is obtained
-            val response: String? = activity.suspendedGetFromURL(activity.apiBase + api_arg)
+            val response = async(CommonPool) {
+                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+            }.await()
 
-            launch(UI) { // launch coroutine in UI context
-                if (response != null) {
-                    //Call function to handle response string, only if response not null
-                    handleResponse(response)
-                    // Stop loader
-                    if (show_progress) {
-                        activity.toggleLoader(false)
-                    }
-                }
-
+            //Call function to handle response string, only if response not null
+            if (response != null) {
+                // If fragment layout is not null (ie. fragment still in view), handle response
+                if (frag_layout != null) {handleResponse(response)}
+                // Else log that handling has been aborted
+                else {Log.i("INFO", "Response processing aborted")}
+                // Stop loader
+                if (show_progress) {activity.toggleLoader(false)}
             }
         }
     }

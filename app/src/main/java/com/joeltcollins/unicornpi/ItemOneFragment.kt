@@ -28,19 +28,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.TextView
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
-import kotlinx.android.synthetic.main.fragment_item_one.*
-import kotlinx.coroutines.experimental.Job
+
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+
+import kotlinx.android.synthetic.main.fragment_item_one.*
 
 
 class ItemOneFragment : Fragment() {
 
-    private var brightnessSeekbar: SeekBar? = null
 
     // While creating view
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -53,9 +54,6 @@ class ItemOneFragment : Fragment() {
 
     // Once view has been inflated/created
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        // Grab UI elements
-        brightnessSeekbar = brightness_seekbar
 
         //Grab resources from XML
         val fadeStatusActive: String = getString(R.string.fade_status_active)
@@ -169,29 +167,25 @@ class ItemOneFragment : Fragment() {
     private fun retreiveAsync(api_arg: String, show_progress: Boolean){
         val activity: MainActivity = activity as MainActivity
 
-        // Start loader
-        if (show_progress) {
-            activity.toggleLoader(true)
-        }
+        // Launch a new coroutine that executes in the Android UI thread
+        launch(UI){
 
-        launch{
+            // Start loader
+            if (show_progress) {activity.toggleLoader(true)}
 
             // Suspend while data is obtained
-            val response: String? = activity.suspendedGetFromURL(activity.apiBase + api_arg)
-            Log.i("INFO", "Response obtained")
+            val response = async(CommonPool) {
+                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+            }.await()
 
-            // TODO: IF TAB CHANGES WHILE RESPONSE IS BEING FETCHED, UI WIDGETS CALLED BY HANDLERESPONSE RETURN NULL, AND CRASH
-            launch(UI) { // launch coroutine in UI context
-                if (response != null) {
-                    //Call function to handle response string, only if response not null
-                    Log.i("INFO", "Processing response")
-                    handleResponse(response)
-                    // Stop loader
-                    if (show_progress) {
-                        activity.toggleLoader(false)
-                    }
-                }
-
+            //Call function to handle response string, only if response not null
+            if (response != null) {
+                // If fragment layout is not null (ie. fragment still in view), handle response
+                if (frag_layout != null) {handleResponse(response)}
+                // Else log that handling has been aborted
+                else {Log.i("INFO", "Response processing aborted")}
+                // Stop loader
+                if (show_progress) {activity.toggleLoader(false)}
             }
         }
     }
@@ -220,7 +214,7 @@ class ItemOneFragment : Fragment() {
             if (responseObject.has("global_brightness_val")) {
                 val responseBrightnessVal = responseObject.getInt("global_brightness_val")
                 if (updateBrightnessSlider) {
-                    brightnessSeekbar?.progress = responseBrightnessVal
+                    brightness_seekbar.progress = responseBrightnessVal
                 }
             }
 

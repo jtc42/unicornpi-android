@@ -66,7 +66,7 @@ class ItemOneFragment : Fragment() {
 
             override fun onProgressChanged(seekBar: SeekBar, progresValue: Int, fromUser: Boolean) {
                 progress = progresValue
-                brightness_text.text = Integer.toString(progress)
+                brightness_text.text = "$progress"
                 if (fromUser) { //Blocks API call if UI is just updating (caused fades to stop on app load)
                     retreiveAsync("brightness/set?val=$progress", false)
                 }

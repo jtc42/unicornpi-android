@@ -23,6 +23,7 @@ package com.joeltcollins.unicornpi
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.design.R.*
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -32,15 +33,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import kotlinx.android.synthetic.main.activity_main.*
+
+import java.net.URL
+
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 
-import java.net.URL
-
-// TODO: Move generic async task to MainActivity. MainActivity to have loading widget, rather than separate for each fragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 // TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
 
@@ -136,9 +137,13 @@ class MainActivity : AppCompatActivity() {
     // BASIC FUNCTIONALITY
     // add/replace fragment in container [framelayout]
     private fun addFragment(fragment: Fragment) {
+        // Hide fragment layout during transaction, while loading spinner activates
+        toggleLoader(true)
+        // Create fragment
         supportFragmentManager
                 .beginTransaction()
-                .setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out)
+                // TODO: Fix references to private animation. Use android.R.anim, or copy anim XML
+                .setCustomAnimations(R.anim.abc_fade_in, R.anim.design_bottom_sheet_slide_out)
                 .replace(R.id.frame_layout, fragment, fragment.javaClass.simpleName)
                 .addToBackStack(fragment.javaClass.simpleName)
                 .commit()
@@ -165,11 +170,12 @@ class MainActivity : AppCompatActivity() {
     fun suspendedGetFromURL(url_string: String): String? {
         return try {
             val response: String = URL(url_string).readText()
+            // Log successful response
             Log.i("INFO", "Response obtained from $url_string")
+            // Return response
             response
         } catch (e: Exception) {
-            // TODO: Actually handle error properly
-            showSnack("Error when parsing response")
+            showSnack("Error connecting to device")
             // Log any errors
             Log.e("ERROR", e.message, e)
             //If connection failed, return null string

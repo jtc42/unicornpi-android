@@ -55,19 +55,19 @@ class ItemOneFragment : Fragment() {
     // Once view has been inflated/created
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        //Grab resources from XML
+        // Grab resources from XML
         val fadeStatusActive: String = getString(R.string.fade_status_active)
         val fadeStatusInactive: String = getString(R.string.fade_status_inactive)
         val statusInactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
 
-        //BRIGHTNESS SEEK LISTENER & FUNCTIONS
+        // BRIGHTNESS SEEK LISTENER & FUNCTIONS
         brightness_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             internal var progress = 0
 
             override fun onProgressChanged(seekBar: SeekBar, progresValue: Int, fromUser: Boolean) {
                 progress = progresValue
                 brightness_text.text = "$progress"
-                if (fromUser) { //Blocks API call if UI is just updating (caused fades to stop on app load)
+                if (fromUser) { // Blocks API call if UI is just updating (caused fades to stop on app load)
                     retreiveAsync("brightness/set?val=$progress", false)
                 }
                 if (fade_status.text.toString() == fadeStatusActive) {
@@ -76,17 +76,14 @@ class ItemOneFragment : Fragment() {
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                //activity.showSnack("Started seek");
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 retreiveAsync("brightness/set?val=$progress", false)
-                //activity.showSnack("Brightness set");
             }
         })
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // ALARM START BUTTON LISTENER & FUNCTIONS
         fade_start_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
@@ -101,7 +98,7 @@ class ItemOneFragment : Fragment() {
             }
         })
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // ALARM START BUTTON LISTENER & FUNCTIONS
         fade_stop_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
@@ -113,22 +110,21 @@ class ItemOneFragment : Fragment() {
             }
         })
 
-        //ALARM TIME BUTTON LISTENER & FUNCTIONS
+        // ALARM TIME BUTTON LISTENER & FUNCTIONS
         alarm_time_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
             internal val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
-                //Start up timepicker fragment
-                //NOTE: ONTIMECHANGE IS HANDLES BY THE ALARMTIMEFRAGMENT
-                //DRAWING TO UI SHOULD BE HANDLED THERE
+                // Start timepicker fragment
+                // onTimeSet, and UI updating, is handled by AlarmTimeFragment
                 val newFragment = AlarmTimeFragment()
                 newFragment.show(activity.fragmentManager, "TimePicker")
             }
         })
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // ALARM START BUTTON LISTENER & FUNCTIONS
         alarm_start_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
@@ -144,7 +140,7 @@ class ItemOneFragment : Fragment() {
             }
         })
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // ALARM START BUTTON LISTENER & FUNCTIONS
         alarm_stop_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
@@ -178,7 +174,7 @@ class ItemOneFragment : Fragment() {
                 activity.suspendedGetFromURL(activity.apiBase + api_arg)
             }.await()
 
-            //Call function to handle response string, only if response not null
+            // Call function to handle response string, only if response not null
             if (response != null) {
                 // If fragment layout is not null (ie. fragment still in view), handle response
                 if (frag_layout != null) {handleResponse(response)}
@@ -206,7 +202,7 @@ class ItemOneFragment : Fragment() {
         try {
             val responseObject = JSONTokener(response).nextValue() as JSONObject
 
-            //If global status is returned, route music have been status/all, so brightness slider should be updated
+            // If global status is returned, route music have been status/all, so brightness slider should be updated
             if (responseObject.has("global_status")) {
                 updateBrightnessSlider = true
             }
@@ -267,10 +263,7 @@ class ItemOneFragment : Fragment() {
                 }
             }
 
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
+        } catch (e: JSONException) {e.printStackTrace()}
     }
 
     companion object {
@@ -280,7 +273,6 @@ class ItemOneFragment : Fragment() {
             fragmentHome.arguments = args
             return fragmentHome
         }
-
     }
 
 

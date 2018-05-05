@@ -43,12 +43,13 @@ class ItemThreeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        //Get current view
+        // Get current view
         return inflater.inflate(R.layout.fragment_item_three, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //RAINBOW START BUTTON LISTENER & FUNCTIONS
+
+        // RAINBOW START BUTTON LISTENER & FUNCTIONS
         rainbow_start_button.setOnClickListener {
             val spinnerPosition = rainbow_theme_spinner.selectedItemPosition
             val speedPercent = rainbow_speed_seekbar.progress
@@ -57,7 +58,7 @@ class ItemThreeFragment : Fragment() {
             retreiveAsync("rainbow/set?mode=$spinnerPosition&speed=$speed&status=1", true)
         }
 
-        //ALSA START BUTTON LISTENER & FUNCTIONS
+        // ALSA START BUTTON LISTENER & FUNCTIONS
         alsa_start_button.setOnClickListener {
             val spinnerPosition = alsa_theme_spinner.selectedItemPosition
             val sensitivity = alsa_sensitivity_seekbar.progress / 10
@@ -67,7 +68,7 @@ class ItemThreeFragment : Fragment() {
             retreiveAsync("alsa/set?mode=$spinnerPosition&sensitivity=$sensitivity&monitor=$mic&volume=$vol&status=1", true)
         }
 
-        //GET API RESPONSE FOR UI STARTUP
+        // GET API RESPONSE FOR UI STARTUP
         retreiveAsync("status/all", true)
 
     }
@@ -88,7 +89,7 @@ class ItemThreeFragment : Fragment() {
                 activity.suspendedGetFromURL(activity.apiBase + api_arg)
             }.await()
 
-            //Call function to handle response string, only if response not null
+            // Call function to handle response string, only if response not null
             if (response != null) {
                 // If fragment layout is not null (ie. fragment still in view), handle response
                 if (frag_layout != null) {handleResponse(response)}
@@ -138,10 +139,7 @@ class ItemThreeFragment : Fragment() {
                 alsa_vol_seekbar.progress = responseAlsaVol
             }
 
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
+        } catch (e: JSONException) {e.printStackTrace()}
     }
 
     companion object {

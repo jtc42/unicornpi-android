@@ -48,38 +48,39 @@ class ItemTwoFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //COLOR PICKER LISTENER
+
+        // COLOR PICKER LISTENER
         color_picker_view.addOnColorSelectedListener { selectedColor ->
             //RGB hex string of selected color
             val hexString = Integer.toHexString(selectedColor).toUpperCase().substring(2, 8)
             retreiveAsync("clamp/set?hex=$hexString&status=1", false)
         }
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_night.setOnClickListener {
             retreiveAsync("clamp/set?hex=ff880d&status=1", false)
             //activity.showSnack("Night lamp started");
         }
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_evening.setOnClickListener {
             retreiveAsync("clamp/set?hex=ff9f46&status=1", false)
             //activity.showSnack("Evening lamp started");
         }
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_desk.setOnClickListener {
             retreiveAsync("clamp/set?hex=ffc08c&status=1", false)
             //activity.showSnack("Desk lamp started");
         }
 
-        //ALARM START BUTTON LISTENER & FUNCTIONS
+        // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_day.setOnClickListener {
             retreiveAsync("clamp/set?hex=ffe4cd&status=1", false)
             //activity.showSnack("Day lamp started");
         }
 
-        //GET API RESPONSE FOR UI STARTUP
+        // GET API RESPONSE FOR UI STARTUP
         retreiveAsync("status/all", true)
 
     }
@@ -100,7 +101,7 @@ class ItemTwoFragment : Fragment() {
                 activity.suspendedGetFromURL(activity.apiBase + api_arg)
             }.await()
 
-            //Call function to handle response string, only if response not null
+            // Call function to handle response string, only if response not null
             if (response != null) {
                 // If fragment layout is not null (ie. fragment still in view), handle response
                 if (frag_layout != null) {handleResponse(response)}
@@ -116,6 +117,7 @@ class ItemTwoFragment : Fragment() {
     private fun handleResponse(response: String) {
         try {
             val responseObject = JSONTokener(response).nextValue() as JSONObject
+
             //If global status is returned, route music have been status/all, so brightness slider should be updated
             if (responseObject.has("static_clamp_hex")) {
                 val responseClampHex = responseObject.getString("static_clamp_hex")
@@ -124,10 +126,7 @@ class ItemTwoFragment : Fragment() {
                 color_picker_view!!.setColor(colorInt, false)
 
             }
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
+        } catch (e: JSONException) {e.printStackTrace()}
     }
 
     companion object {

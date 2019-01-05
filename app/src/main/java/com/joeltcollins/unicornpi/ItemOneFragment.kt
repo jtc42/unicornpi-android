@@ -68,8 +68,13 @@ class ItemOneFragment : Fragment() {
                 progress = progresValue
                 brightness_text.text = "$progress"
                 if (fromUser) { // Blocks API call if UI is just updating (caused fades to stop on app load)
-                    val params = mapOf("val" to progress.toString())
-                    retreiveAsync("brightness/set", params, false)
+                    // OLD
+                    // val params = mapOf("val" to progress.toString())
+                    // retreiveAsync("brightness/set", params, false)
+
+                    //NEW
+                    val params = mapOf("global_brightness_val" to progress.toString())
+                    retreiveAsync("state", params, false, method="POST")
                 }
                 if (fade_status.text.toString() == fadeStatusActive) {
                     fade_status.text = fadeStatusInactive
@@ -80,10 +85,13 @@ class ItemOneFragment : Fragment() {
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                val params = mapOf("val" to progress.toString())
-                retreiveAsync("brightness/set", params, false)
+                // OLD
+                //val params = mapOf("val" to progress.toString())
+                //retreiveAsync("brightness/set", params, false)
 
-                //retreiveAsync("brightness/set", params, false, method="POST")
+                // NEW
+                val params = mapOf("global_brightness_val" to progress.toString())
+                retreiveAsync("state", params, false, method="POST")
             }
         })
 

@@ -55,7 +55,13 @@ class ItemThreeFragment : Fragment() {
             val speedPercent = rainbow_speed_seekbar.progress
             val speed = (speedPercent + 1) / 100.toFloat()
 
-            retreiveAsync("rainbow/set?mode=$spinnerPosition&speed=$speed&status=1", true)
+            val params = mapOf(
+                    "mode" to spinnerPosition.toString(),
+                    "speed" to speed.toString(),
+                    "status" to "1"
+            )
+
+            retreiveAsync("rainbow/set", params,true)
         }
 
         // ALSA START BUTTON LISTENER & FUNCTIONS
@@ -65,17 +71,30 @@ class ItemThreeFragment : Fragment() {
             val mic = alsa_mic_seekbar.progress
             val vol = alsa_vol_seekbar.progress
 
-            retreiveAsync("alsa/set?mode=$spinnerPosition&sensitivity=$sensitivity&monitor=$mic&volume=$vol&status=1", true)
+            val params = mapOf(
+                    "mode" to spinnerPosition.toString(),
+                    "sensitivity" to sensitivity.toString(),
+                    "momnitor" to mic.toString(),
+                    "volume" to vol.toString(),
+                    "status" to "1"
+            )
+
+            retreiveAsync("alsa/set", params, true)
         }
 
         // GET API RESPONSE FOR UI STARTUP
-        retreiveAsync("status/all", true)
+        retreiveAsync("status/all", mapOf(), true)
 
     }
 
 
     // Get and process HTTP response in a coroutine
-    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+    private fun retreiveAsync(
+            api_arg: String,
+            params: Map<String, String>,
+            show_progress: Boolean,
+            redraw_all: Boolean = false,
+            method: String = "GET"){
         val activity: MainActivity = activity as MainActivity
 
         // Launch a new coroutine that executes in the Android UI thread
@@ -86,7 +105,7 @@ class ItemThreeFragment : Fragment() {
 
             // Suspend while data is obtained
             val response = async(CommonPool) {
-                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+                activity.suspendedGetFromURL(activity.apiBase+api_arg, params, method=method)
             }.await()
 
             // Call function to handle response string, only if response not null
@@ -102,9 +121,9 @@ class ItemThreeFragment : Fragment() {
     }
 
     //HANDLE JSON RESPONSE
-    private fun handleResponse(response: String) {
+    private fun handleResponse(responseObject: JSONObject) {
         try {
-            val responseObject = JSONTokener(response).nextValue() as JSONObject
+
             if (responseObject.has("dynamic_rainbow_mode")) {
                 val responseRainbowMode = responseObject.getInt("dynamic_rainbow_mode")
                 rainbow_theme_spinner.setSelection(responseRainbowMode)
@@ -115,8 +134,8 @@ class ItemThreeFragment : Fragment() {
                 rainbow_speed_seekbar.progress = speedPercent
             }
             if (responseObject.has("dynamic_alsa_enabled")) {
-                val responseAlsaEnabled = responseObject.getInt("dynamic_alsa_enabled")
-                if (responseAlsaEnabled == 0) {
+                val responseAlsaEnabled = responseObject.getBoolean("dynamic_alsa_enabled")
+                if (!responseAlsaEnabled) {
                     card_anim_alsa.visibility = View.GONE
                 } else {
                     card_anim_alsa.visibility = View.VISIBLE

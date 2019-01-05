@@ -68,7 +68,8 @@ class ItemOneFragment : Fragment() {
                 progress = progresValue
                 brightness_text.text = "$progress"
                 if (fromUser) { // Blocks API call if UI is just updating (caused fades to stop on app load)
-                    retreiveAsync("brightness/set?val=$progress", false)
+                    val params = mapOf("val" to progress.toString())
+                    retreiveAsync("brightness/set", params, false)
                 }
                 if (fade_status.text.toString() == fadeStatusActive) {
                     fade_status.text = fadeStatusInactive
@@ -79,7 +80,10 @@ class ItemOneFragment : Fragment() {
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                retreiveAsync("brightness/set?val=$progress", false)
+                val params = mapOf("val" to progress.toString())
+                retreiveAsync("brightness/set", params, false)
+
+                //retreiveAsync("brightness/set", params, false, method="POST")
             }
         })
 
@@ -94,7 +98,11 @@ class ItemOneFragment : Fragment() {
                 val minutes = Integer.parseInt(fade_time!!.text.toString())
                 val target = fade_target_seekbar!!.progress / 100.toFloat()
 
-                retreiveAsync("fade/set?minutes=$minutes&target=$target&status=1", false)
+                val params = mapOf(
+                        "minutes" to minutes.toString(),
+                        "target" to target.toString(),
+                        "status" to "1")
+                retreiveAsync("fade/set", params, false)
             }
         })
 
@@ -106,7 +114,11 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Fade stopped")
-                retreiveAsync("fade/set?&status=0", false)
+
+                val params = mapOf(
+                        "status" to "0"
+                )
+                retreiveAsync("fade/set", params, false)
             }
         })
 
@@ -132,11 +144,18 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm set")
-                val lead = Integer.parseInt(alarm_lead.text.toString())
-                val tail = Integer.parseInt(alarm_tail.text.toString())
+                val lead = alarm_lead.text.toString()
+                val tail = alarm_tail.text.toString()
                 val time = alarm_time_text.text.toString()
 
-                retreiveAsync("alarm/set?lead=$lead&tail=$tail&time=$time&status=1", false)
+                val params = mapOf(
+                        "lead" to lead,
+                        "tail" to tail,
+                        "time" to time,
+                        "status" to "1"
+                )
+
+                retreiveAsync("alarm/set", params, false)
             }
         })
 
@@ -148,19 +167,26 @@ class ItemOneFragment : Fragment() {
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm unset")
-                retreiveAsync("alarm/set?&status=0", false)
+
+                val params = mapOf("status" to "0")
+                retreiveAsync("alarm/set", params, false)
             }
         })
 
         // GET API RESPONSE FOR UI STARTUP
         // Happens here because post-execute uses UI elements
-        retreiveAsync("status/all", true)
+        retreiveAsync("status/all", mapOf(), true, redraw_all = true)
 
     }
 
 
     // Get and process HTTP response in a coroutine
-    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+    private fun retreiveAsync(
+            api_arg: String,
+            params: Map<String, String>,
+            show_progress: Boolean,
+            redraw_all: Boolean = false,
+            method: String = "GET"){
         val activity: MainActivity = activity as MainActivity
 
         // Launch a new coroutine that executes in the Android UI thread
@@ -171,13 +197,13 @@ class ItemOneFragment : Fragment() {
 
             // Suspend while data is obtained
             val response = async(CommonPool) {
-                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+                activity.suspendedGetFromURL(activity.apiBase+api_arg, params, method=method)
             }.await()
 
             // Call function to handle response string, only if response not null
             if (response != null) {
                 // If fragment layout is not null (ie. fragment still in view), handle response
-                if (frag_layout != null) {handleResponse(response)}
+                if (frag_layout != null) {handleResponse(response, redraw_all=redraw_all)}
                 // Else log that handling has been aborted
                 else {Log.i("INFO", "Response processing aborted")}
                 // Stop loader
@@ -188,7 +214,7 @@ class ItemOneFragment : Fragment() {
 
 
     //HANDLE JSON RESPONSE
-    private fun handleResponse(response: String) {
+    private fun handleResponse(responseObject: JSONObject, redraw_all: Boolean = false) {
         var updateBrightnessSlider = false
 
         //Grab resources from XML
@@ -200,10 +226,9 @@ class ItemOneFragment : Fragment() {
         val statusInactive: Int = ContextCompat.getColor(context!!, R.color.label_inactive)
 
         try {
-            val responseObject = JSONTokener(response).nextValue() as JSONObject
 
             // If global status is returned, route music have been status/all, so brightness slider should be updated
-            if (responseObject.has("global_status")) {
+            if (redraw_all) {
                 updateBrightnessSlider = true
             }
 
@@ -234,8 +259,8 @@ class ItemOneFragment : Fragment() {
                 alarm_tail!!.setText(responseAlarmTail.toString())
             }
             if (responseObject.has("special_alarm_status")) {
-                val responseAlarmStatus = responseObject.getInt("special_alarm_status")
-                if (responseAlarmStatus == 1) {
+                val responseAlarmStatus = responseObject.getBoolean("special_alarm_status")
+                if (responseAlarmStatus) {
                     alarm_status.text = alarmStatusActive
                     alarm_status.setTextColor(statusActive)
                 } else {
@@ -253,8 +278,8 @@ class ItemOneFragment : Fragment() {
                 fade_target_seekbar!!.progress = fadePercent
             }
             if (responseObject.has("special_fade_status")) {
-                val responseAlarmStatus = responseObject.getInt("special_fade_status")
-                if (responseAlarmStatus == 1) {
+                val responseAlarmStatus = responseObject.getBoolean("special_fade_status")
+                if (responseAlarmStatus) {
                     fade_status.text = fadeStatusActive
                     fade_status.setTextColor(statusActive)
                 } else {

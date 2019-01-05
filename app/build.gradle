@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.joeltcollins.unicornpi"
         minSdkVersion 15
@@ -26,6 +26,7 @@ allprojects {
     repositories {
         maven { url "https://jitpack.io" }
         maven { url "https://maven.google.com" }
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -45,6 +46,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5"
+    compile "khttp:khttp:0.1.0"
 }
 
 kotlin {

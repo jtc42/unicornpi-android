@@ -11,11 +11,11 @@
         android:summary="Local IP address or .local hostname of the device, including its port" />
 
     <EditTextPreference
-        android:defaultValue="1.0"
+        android:defaultValue="v1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="API version"
-        android:inputType="numberDecimal"
+        android:inputType="text"
         android:key="prefs_api_version"
         android:summary="Avoid modifying where possible" />
 </PreferenceScreen>

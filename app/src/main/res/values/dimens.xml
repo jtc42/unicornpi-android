@@ -1,5 +1,5 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="text_card_title">22dp</dimen>
-    <dimen name="card_corner_radius">4dp</dimen>
+    <dimen name="card_corner_radius">6dp</dimen>
 </resources>

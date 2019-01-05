@@ -53,41 +53,48 @@ class ItemTwoFragment : Fragment() {
         color_picker_view.addOnColorSelectedListener { selectedColor ->
             //RGB hex string of selected color
             val hexString = Integer.toHexString(selectedColor).toUpperCase().substring(2, 8)
-            retreiveAsync("clamp/set?hex=$hexString&status=1", false)
+
+            val params = mapOf("hex" to hexString, "status" to "1")
+            retreiveAsync("clamp/set", params, false)
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_night.setOnClickListener {
-            retreiveAsync("clamp/set?hex=ff880d&status=1", false)
-            //activity.showSnack("Night lamp started");
+            val params = mapOf("hex" to "ff880d", "status" to "1")
+            retreiveAsync("clamp/set", params, false)
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_evening.setOnClickListener {
-            retreiveAsync("clamp/set?hex=ff9f46&status=1", false)
-            //activity.showSnack("Evening lamp started");
+            val params = mapOf("hex" to "ff9f46", "status" to "1")
+            retreiveAsync("clamp/set", params, false)
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_desk.setOnClickListener {
-            retreiveAsync("clamp/set?hex=ffc08c&status=1", false)
-            //activity.showSnack("Desk lamp started");
+            val params = mapOf("hex" to "ffc08c", "status" to "1")
+            retreiveAsync("clamp/set", params, false)
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_day.setOnClickListener {
-            retreiveAsync("clamp/set?hex=ffe4cd&status=1", false)
-            //activity.showSnack("Day lamp started");
+            val params = mapOf("hex" to "ffe4cd", "status" to "1")
+            retreiveAsync("clamp/set", params, false)
         }
 
         // GET API RESPONSE FOR UI STARTUP
-        retreiveAsync("status/all", true)
+        retreiveAsync("status/all", mapOf(), true)
 
     }
 
 
     // Get and process HTTP response in a coroutine
-    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+    private fun retreiveAsync(
+            api_arg: String,
+            params: Map<String, String>,
+            show_progress: Boolean,
+            redraw_all: Boolean = false,
+            method: String = "GET"){
         val activity: MainActivity = activity as MainActivity
 
         // Launch a new coroutine that executes in the Android UI thread
@@ -98,7 +105,7 @@ class ItemTwoFragment : Fragment() {
 
             // Suspend while data is obtained
             val response = async(CommonPool) {
-                activity.suspendedGetFromURL(activity.apiBase + api_arg)
+                activity.suspendedGetFromURL(activity.apiBase+api_arg, params, method=method)
             }.await()
 
             // Call function to handle response string, only if response not null
@@ -114,9 +121,8 @@ class ItemTwoFragment : Fragment() {
     }
 
     //HANDLE JSON RESPONSE
-    private fun handleResponse(response: String) {
+    private fun handleResponse(responseObject: JSONObject) {
         try {
-            val responseObject = JSONTokener(response).nextValue() as JSONObject
 
             //If global status is returned, route music have been status/all, so brightness slider should be updated
             if (responseObject.has("static_clamp_hex")) {

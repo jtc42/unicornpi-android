@@ -34,6 +34,8 @@ import android.view.View
 import android.widget.FrameLayout
 
 import java.net.URL
+import khttp.get
+import khttp.responses.Response
 
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
@@ -41,6 +43,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONObject
 
 // TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
 
@@ -56,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             val pref = PreferenceManager.getDefaultSharedPreferences(this)
 
             val deviceIP = pref.getString("prefs_device_ip", "0.0.0.0")
-            val apiVersion = pref.getString("prefs_api_version", "1.0")
+            val apiVersion = pref.getString("prefs_api_version", "v1")
             return "http://$deviceIP/api/$apiVersion/"
         }
 
@@ -166,13 +169,27 @@ class MainActivity : AppCompatActivity() {
                     .show()
 
     // Return string of content returned from a URL
-    fun suspendedGetFromURL(url_string: String): String? {
+    fun suspendedGetFromURL(url_string: String, params: Map<String, String>, method: String = "GET"): JSONObject? {
         return try {
-            val response: String = URL(url_string).readText()
+            val responseObj: Response
+
+            Log.i("INFO", method)
+            // Handle non-GET methods
+            if (method == "POST") {
+                responseObj = khttp.post(url_string, json = params)
+            }
+            // Default to GET
+            else {
+                responseObj = khttp.get(url_string, params = params)
+            }
+
+            val jsonObj : JSONObject = responseObj.jsonObject
+
             // Log successful response
             Log.i("INFO", "Response obtained from $url_string")
+            Log.i("INFO", responseObj.text)
             // Return response
-            response
+            jsonObj
         } catch (e: Exception) {
             showSnack("Error connecting to device")
             // Log any errors
@@ -192,7 +209,7 @@ class MainActivity : AppCompatActivity() {
 
             // Suspend while data is obtained
             val response = async(CommonPool) {
-                suspendedGetFromURL(apiBase + api_arg)
+                suspendedGetFromURL(apiBase + api_arg, mapOf())
             }.await()
 
             //Call function to handle response string, only if response not null

@@ -62,7 +62,7 @@ class ItemOneFragment : Fragment() {
 
         // BRIGHTNESS SEEK LISTENER & FUNCTIONS
         brightness_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            internal var progress = 0
+            var progress = 0
 
             override fun onProgressChanged(seekBar: SeekBar, progresValue: Int, fromUser: Boolean) {
                 progress = progresValue
@@ -85,21 +85,16 @@ class ItemOneFragment : Fragment() {
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                // OLD
-                //val params = mapOf("val" to progress.toString())
-                //retreiveAsync("brightness/set", params, false)
-
-                // NEW
                 val params = mapOf("global_brightness_val" to progress.toString())
                 retreiveAsync("state", params, false, method="POST")
             }
         })
 
-        // ALARM START BUTTON LISTENER & FUNCTIONS
+        // FADE START BUTTON LISTENER & FUNCTIONS
         fade_start_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
-            internal val activity: MainActivity = getActivity() as MainActivity
+            val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
                 activity.showSnack("Fade started")
@@ -107,26 +102,27 @@ class ItemOneFragment : Fragment() {
                 val target = fade_target_seekbar!!.progress / 100.toFloat()
 
                 val params = mapOf(
-                        "minutes" to minutes.toString(),
-                        "target" to target.toString(),
-                        "status" to "1")
-                retreiveAsync("fade/set", params, false)
+                        "special_fade_minutes" to minutes.toString(),
+                        "special_fade_target" to target.toString(),
+                        "special_fade_status" to "1"
+                )
+                retreiveAsync("state", params, false, method = "POST")
             }
         })
 
-        // ALARM START BUTTON LISTENER & FUNCTIONS
+        // FADE START BUTTON LISTENER & FUNCTIONS
         fade_stop_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
-            internal val activity: MainActivity = getActivity() as MainActivity
+            val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
                 activity.showSnack("Fade stopped")
 
                 val params = mapOf(
-                        "status" to "0"
+                        "special_fade_status" to "0"
                 )
-                retreiveAsync("fade/set", params, false)
+                retreiveAsync("state", params, false, method = "POST")
             }
         })
 
@@ -134,7 +130,7 @@ class ItemOneFragment : Fragment() {
         alarm_time_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
-            internal val activity: MainActivity = getActivity() as MainActivity
+            val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
                 // Start timepicker fragment
@@ -148,7 +144,7 @@ class ItemOneFragment : Fragment() {
         alarm_start_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
-            internal val activity: MainActivity = getActivity() as MainActivity
+            val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm set")
@@ -157,13 +153,13 @@ class ItemOneFragment : Fragment() {
                 val time = alarm_time_text.text.toString()
 
                 val params = mapOf(
-                        "lead" to lead,
-                        "tail" to tail,
-                        "time" to time,
-                        "status" to "1"
+                        "special_alarm_lead" to lead,
+                        "special_alarm_tail" to tail,
+                        "special_alarm_time" to time,
+                        "special_alarm_status" to "1"
                 )
 
-                retreiveAsync("alarm/set", params, false)
+                retreiveAsync("state", params, false, method = "POST")
             }
         })
 
@@ -171,19 +167,19 @@ class ItemOneFragment : Fragment() {
         alarm_stop_button.setOnClickListener(object : View.OnClickListener {
 
             //Get main activity
-            internal val activity: MainActivity = getActivity() as MainActivity
+            val activity: MainActivity = getActivity() as MainActivity
 
             override fun onClick(view: View) {
                 activity.showSnack("Alarm unset")
 
-                val params = mapOf("status" to "0")
-                retreiveAsync("alarm/set", params, false)
+                val params = mapOf("special_alarm_status" to "0")
+                retreiveAsync("state", params, false, method = "POST")
             }
         })
 
         // GET API RESPONSE FOR UI STARTUP
         // Happens here because post-execute uses UI elements
-        retreiveAsync("status/all", mapOf(), true, redraw_all = true)
+        retreiveAsync("state", mapOf(), true, redraw_all = true, method = "GET")
 
     }
 

@@ -56,12 +56,13 @@ class ItemThreeFragment : Fragment() {
             val speed = (speedPercent + 1) / 100.toFloat()
 
             val params = mapOf(
-                    "mode" to spinnerPosition.toString(),
-                    "speed" to speed.toString(),
-                    "status" to "1"
+                    "dynamic_rainbow_mode" to spinnerPosition.toString(),
+                    "dynamic_rainbow_speed" to speed.toString(),
+                    "global_mode" to "rainbow",
+                    "global_status" to "1"
             )
 
-            retreiveAsync("rainbow/set", params,true)
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // ALSA START BUTTON LISTENER & FUNCTIONS
@@ -72,18 +73,19 @@ class ItemThreeFragment : Fragment() {
             val vol = alsa_vol_seekbar.progress
 
             val params = mapOf(
-                    "mode" to spinnerPosition.toString(),
-                    "sensitivity" to sensitivity.toString(),
-                    "momnitor" to mic.toString(),
-                    "volume" to vol.toString(),
-                    "status" to "1"
+                    "dynamic_alsa_mode" to spinnerPosition.toString(),
+                    "dynamic_alsa_sensitivity" to sensitivity.toString(),
+                    "dynamic_alsa_monitor" to mic.toString(),
+                    "dynamic_alsa_volume" to vol.toString(),
+                    "global_mode" to "alsa",
+                    "global_status" to "1"
             )
 
-            retreiveAsync("alsa/set", params, true)
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // GET API RESPONSE FOR UI STARTUP
-        retreiveAsync("status/all", mapOf(), true)
+        retreiveAsync("state", mapOf(), true, redraw_all = true, method = "GET")
 
     }
 
@@ -140,6 +142,9 @@ class ItemThreeFragment : Fragment() {
                 } else {
                     card_anim_alsa.visibility = View.VISIBLE
                 }
+            }
+            else {
+                card_anim_alsa.visibility = View.GONE
             }
             if (responseObject.has("dynamic_alsa_mode")) {
                 val responseAlsaMode = responseObject.getInt("dynamic_alsa_mode")

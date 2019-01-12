@@ -27,7 +27,7 @@
             android:action="android.intent.action.VIEW"
             android:targetClass="com.joeltcollins.unicornpi.MainActivity"
             android:targetPackage="com.joeltcollins.unicornpi">
-            <extra android:name="android.intent.extra.TEXT" android:value="clamp/set?hex=ff9f46&amp;status=1" />
+            <extra android:name="android.intent.extra.TEXT" android:value="clamp/evening" />
         </intent>
     </shortcut>
 
@@ -42,7 +42,7 @@
             android:action="android.intent.action.VIEW"
             android:targetClass="com.joeltcollins.unicornpi.MainActivity"
             android:targetPackage="com.joeltcollins.unicornpi">
-            <extra android:name="android.intent.extra.TEXT" android:value="brightness/set?val=80" />
+            <extra android:name="android.intent.extra.TEXT" android:value="brightness/80" />
         </intent>
     </shortcut>
 
@@ -57,7 +57,7 @@
             android:action="android.intent.action.VIEW"
             android:targetClass="com.joeltcollins.unicornpi.MainActivity"
             android:targetPackage="com.joeltcollins.unicornpi">
-            <extra android:name="android.intent.extra.TEXT" android:value="brightness/set?val=20" />
+            <extra android:name="android.intent.extra.TEXT" android:value="brightness/20" />
         </intent>
     </shortcut>
 

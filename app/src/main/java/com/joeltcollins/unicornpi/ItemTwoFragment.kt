@@ -54,36 +54,56 @@ class ItemTwoFragment : Fragment() {
             //RGB hex string of selected color
             val hexString = Integer.toHexString(selectedColor).toUpperCase().substring(2, 8)
 
-            val params = mapOf("hex" to hexString, "status" to "1")
-            retreiveAsync("clamp/set", params, false)
+            val params = mapOf(
+                    "static_clamp_hex" to hexString,
+                    "global_mode" to "clamp",
+                    "global_status" to "1"
+            )
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_night.setOnClickListener {
-            val params = mapOf("hex" to "ff880d", "status" to "1")
-            retreiveAsync("clamp/set", params, false)
+            val params = mapOf(
+                    "static_clamp_hex" to "ff880d",
+                    "global_mode" to "clamp",
+                    "global_status" to "1"
+            )
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_evening.setOnClickListener {
-            val params = mapOf("hex" to "ff9f46", "status" to "1")
-            retreiveAsync("clamp/set", params, false)
+            val params = mapOf(
+                    "static_clamp_hex" to "ff9f46",
+                    "global_mode" to "clamp",
+                    "global_status" to "1"
+            )
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_desk.setOnClickListener {
-            val params = mapOf("hex" to "ffc08c", "status" to "1")
-            retreiveAsync("clamp/set", params, false)
+            val params = mapOf(
+                    "static_clamp_hex" to "ffc08c",
+                    "global_mode" to "clamp",
+                    "global_status" to "1"
+            )
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // CLAMP BUTTON LISTENER & FUNCTIONS
         clamp_button_day.setOnClickListener {
-            val params = mapOf("hex" to "ffe4cd", "status" to "1")
-            retreiveAsync("clamp/set", params, false)
+            val params = mapOf(
+                    "static_clamp_hex" to "ffe4cd",
+                    "global_mode" to "clamp",
+                    "global_status" to "1"
+            )
+            retreiveAsync("state", params, false, method = "POST")
         }
 
         // GET API RESPONSE FOR UI STARTUP
-        retreiveAsync("status/all", mapOf(), true)
+        retreiveAsync("state", mapOf(), true, redraw_all = true, method = "GET")
 
     }
 

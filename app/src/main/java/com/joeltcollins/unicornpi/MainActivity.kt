@@ -99,8 +99,33 @@ class MainActivity : AppCompatActivity() {
         if (bnd != null) {
             // Create a string 'intentArgument' based on intent extra 'TEXT'
             val intentArgument = bnd.get("android.intent.extra.TEXT") as String
-            // Run async call to intentArgument URL
-            retreiveAsync(intentArgument, true)
+
+            var params: Map<String, String> = mapOf()
+
+            if (intentArgument == "status/clear") {
+                params = mapOf("global_status" to "0")
+            }
+            else if (intentArgument == "clamp/evening") {
+                params = mapOf(
+                        "static_clamp_hex" to "ff880d",
+                        "global_mode" to "clamp",
+                        "global_status" to "1"
+                )
+            }
+            else if (intentArgument == "brightness/80") {
+                params = mapOf(
+                        "global_brightness_val" to "80",
+                        "global_status" to "1"
+                )
+            }
+            else if (intentArgument == "brightness/20") {
+                params = mapOf(
+                        "global_brightness_val" to "20",
+                        "global_status" to "1"
+                )
+            }
+
+            retreiveAsync("state", params, false, method = "POST")
         }
 
     }
@@ -118,7 +143,10 @@ class MainActivity : AppCompatActivity() {
         // Handle item selection
         when (item.itemId) {
             R.id.menu_main_clear -> {
-                retreiveAsync("status/clear", false)
+                val params = mapOf(
+                        "global_status" to "0"
+                )
+                retreiveAsync("state", params, false, method = "POST")
                 return true
             }
             R.id.menu_main_settings -> {
@@ -200,7 +228,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Get and process HTTP response in a coroutine
-    private fun retreiveAsync(api_arg: String, show_progress: Boolean){
+    private fun retreiveAsync(
+            api_arg: String,
+            params: Map<String, String>,
+            show_progress: Boolean,
+            redraw_all: Boolean = false,
+            method: String = "GET"){
+
         // Launch a new coroutine that executes in the Android UI thread
         launch(UI){
 
@@ -209,10 +243,10 @@ class MainActivity : AppCompatActivity() {
 
             // Suspend while data is obtained
             val response = async(CommonPool) {
-                suspendedGetFromURL(apiBase + api_arg, mapOf())
+                suspendedGetFromURL(apiBase+api_arg, params, method=method)
             }.await()
 
-            //Call function to handle response string, only if response not null
+            // Call function to handle response string, only if response not null
             if (response != null) {
                 // Stop loader
                 if (show_progress) {toggleLoader(false)}

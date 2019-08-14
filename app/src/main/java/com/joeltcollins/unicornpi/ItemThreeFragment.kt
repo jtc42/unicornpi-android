@@ -30,10 +30,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONTokener
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.*
 
 import kotlinx.android.synthetic.main.fragment_item_three.*
 
@@ -100,15 +97,15 @@ class ItemThreeFragment : Fragment() {
         val activity: MainActivity = activity as MainActivity
 
         // Launch a new coroutine that executes in the Android UI thread
-        launch(UI){
+        GlobalScope.launch(Dispatchers.Main) {
 
             // Start loader
             if (show_progress) {activity.toggleLoader(true)}
 
             // Suspend while data is obtained
-            val response = async(CommonPool) {
+            val response = withContext(Dispatchers.Default) {
                 activity.suspendedGetFromURL(activity.apiBase+api_arg, params, method=method)
-            }.await()
+            }
 
             // Call function to handle response string, only if response not null
             if (response != null) {

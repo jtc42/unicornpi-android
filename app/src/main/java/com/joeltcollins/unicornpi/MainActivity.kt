@@ -37,12 +37,8 @@ import java.net.URL
 import khttp.get
 import khttp.responses.Response
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
-
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
 import org.json.JSONObject
 
 // TODO: Support multiple devices, with list of hosts in preferences, and spinner in top bar
@@ -236,15 +232,15 @@ class MainActivity : AppCompatActivity() {
             method: String = "GET"){
 
         // Launch a new coroutine that executes in the Android UI thread
-        launch(UI){
+        GlobalScope.launch(Dispatchers.Main){
 
             // Start loader
             if (show_progress) {toggleLoader(true)}
 
             // Suspend while data is obtained
-            val response = async(CommonPool) {
+            val response = withContext(Dispatchers.Default) {
                 suspendedGetFromURL(apiBase+api_arg, params, method=method)
-            }.await()
+            }
 
             // Call function to handle response string, only if response not null
             if (response != null) {
